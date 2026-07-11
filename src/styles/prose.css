@@ -145,3 +145,178 @@
   border-bottom: 1px solid var(--border-dim);
   font-style: italic;
 }
+
+/* ── Research Monograph Visual Components ─────────────────────────────────── */
+
+/* Epistemic tags */
+.prose .ep-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid currentColor;
+  vertical-align: middle;
+  margin: 0 4px 2px 0;
+  line-height: 1.6;
+}
+.prose .ep-tag.empirical { color: #0D9488; }
+.prose .ep-tag.theory    { color: #7c3aed; }
+.prose .ep-tag.speculative { color: var(--gold); }
+.prose .ep-tag.synthesis { color: var(--ember); }
+
+/* Epistemic tag legend */
+.prose .ep-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-2);
+  border: 1px solid var(--border-dim);
+  margin-bottom: var(--space-8);
+  border-radius: var(--radius-sm);
+}
+.prose .ep-legend span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Callout boxes */
+.prose .callout {
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  border-left: 4px solid #0D9488;
+  padding: var(--space-5) var(--space-6);
+  margin: var(--space-8) 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.prose .callout.flag    { border-left-color: var(--ember); }
+.prose .callout.finding { border-left-color: var(--gold); }
+.prose .callout-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #0D9488;
+  margin: 0 0 var(--space-3);
+  font-weight: 600;
+}
+.prose .callout.flag    .callout-label { color: var(--ember); }
+.prose .callout.finding .callout-label { color: var(--gold); }
+.prose .callout p:last-child { margin-bottom: 0; }
+
+/* Executive summary card grid */
+.prose .exec-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  margin: var(--space-8) 0;
+}
+.prose .exec-card {
+  background: var(--warm-white);
+  border: 1px solid var(--border-mid);
+  border-top: 3px solid #0D9488;
+  padding: var(--space-5);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+.prose .exec-card h5 {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 var(--space-3);
+  font-weight: 600;
+}
+.prose .exec-card p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+@media (max-width: 768px) {
+  .prose .exec-grid { grid-template-columns: 1fr; }
+}
+
+/* SVG / diagram container */
+.prose .diagram {
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  padding: var(--space-6);
+  margin: var(--space-8) 0;
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+}
+.prose .diagram svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+.prose .diagram figcaption {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-align: center;
+  margin-top: var(--space-4);
+  letter-spacing: 0.04em;
+}
+
+/* Timeline */
+.prose .timeline {
+  margin: var(--space-8) 0;
+  position: relative;
+  padding-left: var(--space-8);
+  border-left: 2px solid var(--border-mid);
+}
+.prose .tl-item {
+  position: relative;
+  padding-bottom: var(--space-8);
+}
+.prose .tl-item::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--space-8) - 5px);
+  top: 5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--void);
+  border: 2px solid #0D9488;
+}
+.prose .tl-date {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--gold);
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-2);
+}
+.prose .tl-item h4 {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-2);
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body);
+}
+.prose .tl-item p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Monograph stat highlight */
+.prose .stat {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+

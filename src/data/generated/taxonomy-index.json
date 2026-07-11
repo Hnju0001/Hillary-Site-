@@ -5,6 +5,7 @@
       "contentIds": [
         "digest-cir-v2-core-argument",
         "digest-it-was-never-about-the-music",
+        "digest-coordination-stack",
         "research-aurora",
         "research-bainbridge-warning",
         "research-behavioral-layer-exposure",
@@ -57,7 +58,7 @@
         "cycle-323eb86f-d1b0-81ea-a30a-d508ce1beee1",
         "cycle-323eb86f-d1b0-81fa-a0e3-e2c2c5bdfbee"
       ],
-      "count": 53
+      "count": 54
     },
     "constitutional-design": {
       "label": "constitutional-design",
@@ -71,6 +72,13 @@
       "label": "ai-architecture",
       "contentIds": [
         "digest-it-was-never-about-the-music"
+      ],
+      "count": 1
+    },
+    "organisational-architecture": {
+      "label": "organisational-architecture",
+      "contentIds": [
+        "digest-coordination-stack"
       ],
       "count": 1
     },
@@ -265,6 +273,7 @@
       "label": "governance",
       "contentIds": [
         "digest-cir-v2-core-argument",
+        "digest-coordination-stack",
         "research-aurora",
         "research-bainbridge-warning",
         "research-behavioral-layer-exposure",
@@ -275,7 +284,7 @@
         "research-r0-r3-classification",
         "research-tongue-tie-diagnostic"
       ],
-      "count": 10
+      "count": 11
     },
     "constitutional-design": {
       "label": "constitutional-design",
@@ -288,10 +297,11 @@
       "label": "institutional-design",
       "contentIds": [
         "digest-cir-v2-core-argument",
+        "digest-coordination-stack",
         "research-bainbridge-warning",
         "research-trust-irreversibility-residue"
       ],
-      "count": 3
+      "count": 4
     },
     "ai-systems": {
       "label": "ai-systems",
@@ -300,6 +310,13 @@
         "research-dcfb"
       ],
       "count": 2
+    },
+    "organisational-architecture": {
+      "label": "organisational-architecture",
+      "contentIds": [
+        "digest-coordination-stack"
+      ],
+      "count": 1
     },
     "Real-time Execution": {
       "label": "Real-time Execution",
@@ -648,6 +665,48 @@
       "label": "world-simulation",
       "contentIds": [
         "digest-it-was-never-about-the-music"
+      ],
+      "count": 1
+    },
+    "coordination-stack": {
+      "label": "coordination-stack",
+      "contentIds": [
+        "digest-coordination-stack"
+      ],
+      "count": 1
+    },
+    "organisational-economics": {
+      "label": "organisational-economics",
+      "contentIds": [
+        "digest-coordination-stack"
+      ],
+      "count": 1
+    },
+    "conways-law": {
+      "label": "conways-law",
+      "contentIds": [
+        "digest-coordination-stack"
+      ],
+      "count": 1
+    },
+    "firm-boundaries": {
+      "label": "firm-boundaries",
+      "contentIds": [
+        "digest-coordination-stack"
+      ],
+      "count": 1
+    },
+    "agentic-ai": {
+      "label": "agentic-ai",
+      "contentIds": [
+        "digest-coordination-stack"
+      ],
+      "count": 1
+    },
+    "project-management": {
+      "label": "project-management",
+      "contentIds": [
+        "digest-coordination-stack"
       ],
       "count": 1
     },
@@ -1436,6 +1495,23 @@
       ],
       "count": 12
     },
+    "rsps-core": {
+      "label": "rsps-core",
+      "contentIds": [
+        "digest-coordination-stack",
+        "research-cmcp",
+        "field-signal-001"
+      ],
+      "count": 3
+    },
+    "bainbridge-warning": {
+      "label": "bainbridge-warning",
+      "contentIds": [
+        "digest-coordination-stack",
+        "research-pocketos-incident"
+      ],
+      "count": 2
+    },
     "aurora-core": {
       "label": "aurora-core",
       "contentIds": [
@@ -1451,14 +1527,6 @@
         "product-bainbridge-warning"
       ],
       "count": 3
-    },
-    "rsps-core": {
-      "label": "rsps-core",
-      "contentIds": [
-        "research-cmcp",
-        "field-signal-001"
-      ],
-      "count": 2
     },
     "DCFB": {
       "label": "DCFB",
@@ -1478,13 +1546,6 @@
       "label": "Bainbridge Warning",
       "contentIds": [
         "phase-3-constitutional-runtime"
-      ],
-      "count": 1
-    },
-    "bainbridge-warning": {
-      "label": "bainbridge-warning",
-      "contentIds": [
-        "research-pocketos-incident"
       ],
       "count": 1
     },
@@ -1546,5 +1607,5 @@
       "count": 1
     }
   },
-  "generatedAt": "2026-07-01T17:30:53.790Z"
+  "generatedAt": "2026-07-11T11:56:50.181Z"
 }

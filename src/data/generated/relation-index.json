@@ -140,6 +140,72 @@
         "inferred": false
       }
     ],
+    "digest-coordination-stack": [
+      {
+        "target": "product-cir",
+        "type": "derives_from",
+        "confidence": "high",
+        "explanation": "The Coordination Stack operationalises the Authority Architecture and Intent Specification dimensions of CIR v2.0.",
+        "manual": true,
+        "inferred": false
+      },
+      {
+        "target": "digest-cir-v2-core-argument",
+        "type": "extends",
+        "confidence": "high",
+        "explanation": "The Bainbridge Warning and AOD integrations in this monograph extend the constitutional framing established in the CIR v2.0 Core Argument.",
+        "manual": true,
+        "inferred": false
+      },
+      {
+        "target": "research-cmcp",
+        "type": "clarifies",
+        "confidence": "low",
+        "explanation": "Digest entry shares lineage [rsps-core] and domain [governance] with this research entry.",
+        "manual": false,
+        "inferred": true
+      },
+      {
+        "target": "research-pocketos-incident",
+        "type": "clarifies",
+        "confidence": "low",
+        "explanation": "Digest entry shares lineage [bainbridge-warning] and domain [governance] with this research entry.",
+        "manual": false,
+        "inferred": true
+      },
+      {
+        "target": "clause-coherence-overfitting-guard",
+        "type": "governance_relevant_to",
+        "confidence": "low",
+        "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+        "manual": false,
+        "inferred": true
+      },
+      {
+        "target": "clause-epistemological-immune-system",
+        "type": "governance_relevant_to",
+        "confidence": "low",
+        "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+        "manual": false,
+        "inferred": true
+      },
+      {
+        "target": "clause-intent-specification",
+        "type": "governance_relevant_to",
+        "confidence": "low",
+        "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+        "manual": false,
+        "inferred": true
+      },
+      {
+        "target": "clause-irreversibility-threshold",
+        "type": "governance_relevant_to",
+        "confidence": "low",
+        "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+        "manual": false,
+        "inferred": true
+      }
+    ],
     "digest-the-poisoned-instrument": [
       {
         "target": "research-bainbridge-warning",
@@ -1468,6 +1534,14 @@
         "inferred": true
       },
       {
+        "target": "digest-coordination-stack",
+        "type": "clarifies",
+        "confidence": "low",
+        "explanation": "Field signal shares [governance, rsps-core] with this node and acts as a nearby specimen or synthesis trace.",
+        "manual": false,
+        "inferred": true
+      },
+      {
         "target": "research-aurora",
         "type": "clarifies",
         "confidence": "low",
@@ -2028,6 +2102,14 @@
         "inferred": false
       },
       {
+        "target": "digest-coordination-stack",
+        "type": "derives_from",
+        "confidence": "high",
+        "explanation": "The Coordination Stack operationalises the Authority Architecture and Intent Specification dimensions of CIR v2.0.",
+        "manual": true,
+        "inferred": false
+      },
+      {
         "target": "product-bainbridge-warning-book",
         "type": "extends",
         "confidence": "high",
@@ -2068,6 +2150,32 @@
         "explanation": "Extends the security and runtime trust questions raised in The Poisoned Instrument to a broader spatio-temporal world-simulation thesis.",
         "manual": true,
         "inferred": false
+      }
+    ],
+    "digest-cir-v2-core-argument": [
+      {
+        "target": "digest-coordination-stack",
+        "type": "extends",
+        "confidence": "high",
+        "explanation": "The Bainbridge Warning and AOD integrations in this monograph extend the constitutional framing established in the CIR v2.0 Core Argument.",
+        "manual": true,
+        "inferred": false
+      },
+      {
+        "target": "product-cir",
+        "type": "prototype_for",
+        "confidence": "high",
+        "explanation": "The CIR v2.0 digest entry is the public-facing brief that introduces the product argument — reading order goes brief first, then full instrument.",
+        "manual": true,
+        "inferred": false
+      },
+      {
+        "target": "field-signal-001",
+        "type": "clarifies",
+        "confidence": "low",
+        "explanation": "Field signal shares [governance] with this node and acts as a nearby specimen or synthesis trace.",
+        "manual": false,
+        "inferred": true
       }
     ],
     "research-bainbridge-warning": [
@@ -2258,6 +2366,14 @@
         "inferred": true
       },
       {
+        "target": "digest-coordination-stack",
+        "type": "governance_relevant_to",
+        "confidence": "low",
+        "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+        "manual": false,
+        "inferred": true
+      },
+      {
         "target": "research-aurora",
         "type": "governance_relevant_to",
         "confidence": "low",
@@ -2364,6 +2480,14 @@
         "inferred": false
       },
       {
+        "target": "digest-coordination-stack",
+        "type": "clarifies",
+        "confidence": "low",
+        "explanation": "Digest entry shares lineage [bainbridge-warning] and domain [governance] with this research entry.",
+        "manual": false,
+        "inferred": true
+      },
+      {
         "target": "field-signal-001",
         "type": "clarifies",
         "confidence": "low",
@@ -2465,6 +2589,14 @@
       },
       {
         "target": "digest-cir-v2-core-argument",
+        "type": "governance_relevant_to",
+        "confidence": "low",
+        "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+        "manual": false,
+        "inferred": true
+      },
+      {
+        "target": "digest-coordination-stack",
         "type": "governance_relevant_to",
         "confidence": "low",
         "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
@@ -2786,6 +2918,14 @@
         "inferred": true
       },
       {
+        "target": "digest-coordination-stack",
+        "type": "governance_relevant_to",
+        "confidence": "low",
+        "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+        "manual": false,
+        "inferred": true
+      },
+      {
         "target": "research-aurora",
         "type": "governance_relevant_to",
         "confidence": "low",
@@ -3056,24 +3196,6 @@
         "inferred": true
       }
     ],
-    "digest-cir-v2-core-argument": [
-      {
-        "target": "product-cir",
-        "type": "prototype_for",
-        "confidence": "high",
-        "explanation": "The CIR v2.0 digest entry is the public-facing brief that introduces the product argument — reading order goes brief first, then full instrument.",
-        "manual": true,
-        "inferred": false
-      },
-      {
-        "target": "field-signal-001",
-        "type": "clarifies",
-        "confidence": "low",
-        "explanation": "Field signal shares [governance] with this node and acts as a nearby specimen or synthesis trace.",
-        "manual": false,
-        "inferred": true
-      }
-    ],
     "research-behavioral-layer-exposure": [
       {
         "target": "cycle-332eb86f-d1b0-8182-867e-c510fa5dd485",
@@ -3312,6 +3434,14 @@
         "inferred": true
       },
       {
+        "target": "digest-coordination-stack",
+        "type": "clarifies",
+        "confidence": "low",
+        "explanation": "Digest entry shares lineage [rsps-core] and domain [governance] with this research entry.",
+        "manual": false,
+        "inferred": true
+      },
+      {
         "target": "product-bainbridge-warning",
         "type": "example_of",
         "confidence": "low",
@@ -3389,6 +3519,14 @@
     "clause-epistemological-immune-system": [
       {
         "target": "digest-cir-v2-core-argument",
+        "type": "governance_relevant_to",
+        "confidence": "low",
+        "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+        "manual": false,
+        "inferred": true
+      },
+      {
+        "target": "digest-coordination-stack",
         "type": "governance_relevant_to",
         "confidence": "low",
         "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
@@ -3538,6 +3676,16 @@
         "type": "clarifies",
         "confidence": "low",
         "explanation": "Field signal shares [governance] with this node and acts as a nearby specimen or synthesis trace.",
+        "manual": false,
+        "inferred": true
+      }
+    ],
+    "digest-coordination-stack": [
+      {
+        "target": "field-signal-001",
+        "type": "clarifies",
+        "confidence": "low",
+        "explanation": "Field signal shares [governance, rsps-core] with this node and acts as a nearby specimen or synthesis trace.",
         "manual": false,
         "inferred": true
       }
@@ -3853,5 +4001,5 @@
       }
     ]
   },
-  "generatedAt": "2026-07-01T17:30:53.787Z"
+  "generatedAt": "2026-07-11T11:56:50.178Z"
 }

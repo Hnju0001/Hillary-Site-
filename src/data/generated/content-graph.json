@@ -59,6 +59,39 @@
       "publishedAt": "2026-06-28T00:00:00.000Z"
     },
     {
+      "id": "digest-coordination-stack",
+      "slug": "the-coordination-stack",
+      "title": "The Coordination Stack: AI, Project Management, and the Reorganisation of the Firm",
+      "description": "A synthesis of organisational architecture, transaction-cost economics, and Conway's Law in the era of agentic coordination.",
+      "contentType": "digest",
+      "status": "published",
+      "crystallization": "crystallized",
+      "governanceRelevance": "direct",
+      "domains": [
+        "governance",
+        "organisational-architecture"
+      ],
+      "themes": [
+        "governance",
+        "institutional-design",
+        "organisational-architecture"
+      ],
+      "tags": [
+        "coordination-stack",
+        "organisational-economics",
+        "conways-law",
+        "firm-boundaries",
+        "agentic-ai",
+        "project-management"
+      ],
+      "lineage": [
+        "rsps-core",
+        "bainbridge-warning"
+      ],
+      "sourceCollection": "digest",
+      "publishedAt": "2026-07-11T00:00:00.000Z"
+    },
+    {
       "id": "digest-the-poisoned-instrument",
       "slug": "the-poisoned-instrument",
       "title": "The Poisoned Instrument: Security and Sovereignty in the Agentic Runtime",
@@ -1907,6 +1940,30 @@
       "inferred": false
     },
     {
+      "source": "digest-coordination-stack",
+      "target": "product-cir",
+      "type": "derives_from",
+      "confidence": "high",
+      "explanation": "The Coordination Stack operationalises the Authority Architecture and Intent Specification dimensions of CIR v2.0.",
+      "provenance": [
+        "section: The Accountability Distribution Model"
+      ],
+      "manual": true,
+      "inferred": false
+    },
+    {
+      "source": "digest-coordination-stack",
+      "target": "digest-cir-v2-core-argument",
+      "type": "extends",
+      "confidence": "high",
+      "explanation": "The Bainbridge Warning and AOD integrations in this monograph extend the constitutional framing established in the CIR v2.0 Core Argument.",
+      "provenance": [
+        "section: The Ontological Layer"
+      ],
+      "manual": true,
+      "inferred": false
+    },
+    {
       "source": "digest-the-poisoned-instrument",
       "target": "research-bainbridge-warning",
       "type": "derives_from",
@@ -2725,6 +2782,76 @@
       "type": "clarifies",
       "confidence": "low",
       "explanation": "Field signal shares [governance] with this node and acts as a nearby specimen or synthesis trace.",
+      "provenance": [],
+      "manual": false,
+      "inferred": true
+    },
+    {
+      "source": "digest-coordination-stack",
+      "target": "research-cmcp",
+      "type": "clarifies",
+      "confidence": "low",
+      "explanation": "Digest entry shares lineage [rsps-core] and domain [governance] with this research entry.",
+      "provenance": [],
+      "manual": false,
+      "inferred": true
+    },
+    {
+      "source": "digest-coordination-stack",
+      "target": "research-pocketos-incident",
+      "type": "clarifies",
+      "confidence": "low",
+      "explanation": "Digest entry shares lineage [bainbridge-warning] and domain [governance] with this research entry.",
+      "provenance": [],
+      "manual": false,
+      "inferred": true
+    },
+    {
+      "source": "digest-coordination-stack",
+      "target": "clause-coherence-overfitting-guard",
+      "type": "governance_relevant_to",
+      "confidence": "low",
+      "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+      "provenance": [],
+      "manual": false,
+      "inferred": true
+    },
+    {
+      "source": "digest-coordination-stack",
+      "target": "clause-epistemological-immune-system",
+      "type": "governance_relevant_to",
+      "confidence": "low",
+      "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+      "provenance": [],
+      "manual": false,
+      "inferred": true
+    },
+    {
+      "source": "digest-coordination-stack",
+      "target": "clause-intent-specification",
+      "type": "governance_relevant_to",
+      "confidence": "low",
+      "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+      "provenance": [],
+      "manual": false,
+      "inferred": true
+    },
+    {
+      "source": "digest-coordination-stack",
+      "target": "clause-irreversibility-threshold",
+      "type": "governance_relevant_to",
+      "confidence": "low",
+      "explanation": "Both operate in domains [governance] and the content has direct governance relevance.",
+      "provenance": [],
+      "manual": false,
+      "inferred": true
+    },
+    {
+      "source": "field-signal-001",
+      "target": "digest-coordination-stack",
+      "type": "clarifies",
+      "confidence": "low",
+      "explanation": "Field signal shares [governance, rsps-core] with this node and acts as a nearby specimen or synthesis trace.",
       "provenance": [],
       "manual": false,
       "inferred": true
@@ -4230,14 +4357,14 @@
       "inferred": true
     }
   ],
-  "generatedAt": "2026-07-01T17:30:53.787Z",
+  "generatedAt": "2026-07-11T11:56:50.178Z",
   "stats": {
-    "totalNodes": 61,
-    "totalEdges": 229,
-    "manualEdges": 54,
-    "inferredEdges": 175,
+    "totalNodes": 62,
+    "totalEdges": 238,
+    "manualEdges": 56,
+    "inferredEdges": 182,
     "byType": {
-      "digest": 33,
+      "digest": 34,
       "research": 18,
       "product": 4,
       "clause": 4,
