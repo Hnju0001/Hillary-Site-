@@ -133,16 +133,51 @@ export function scoreCoherence(entry: any): CoherenceReport {
     provenanceIntegrity * weights.provenanceIntegrity
   );
 
-  const autoPublish = totalScore > 0.95;
+  // ── Style & Formatting Compliance Deductions (Voice Guide Alignment) ──────
+  let complianceDeductions = 0;
+  
+  // 1. Check for em-dashes (—)
+  if (entry.rawMarkdown?.includes('—') || entry.rawMarkdown?.includes('\u2014')) {
+    complianceDeductions += 0.10;
+    flags.push('STYLE VIOLATION: Contains forbidden em-dashes (—). Replace with colons, semicolons, or rewrite.');
+  }
+
+  // 2. Check for banned buzzwords
+  const BANNED_BUZZWORDS = ['delve', 'tapestry', 'testament', 'revolutionize', 'paradigm shift', 'pivotal', 'leverage'];
+  const foundBuzzwords = BANNED_BUZZWORDS.filter(word => fullText.includes(word));
+  if (foundBuzzwords.length > 0) {
+    complianceDeductions += 0.10 * foundBuzzwords.length;
+    flags.push(`STYLE VIOLATION: Contains prohibited AI buzzwords: ${foundBuzzwords.map(w => `"${w}"`).join(', ')}`);
+  }
+
+  // 3. Check for specific model versions (e.g. GPT-4o, Sonnet 3.5)
+  const specificModelRegex = /\b(gpt-4|gpt-5|sonnet\s+\d+|gemini\s+\d+|claude\s+\d+)\b/gi;
+  const foundSpecificModels = fullText.match(specificModelRegex);
+  if (foundSpecificModels) {
+    complianceDeductions += 0.10;
+    flags.push(`STYLE VIOLATION: Referenced specific model versions: ${[...new Set(foundSpecificModels)].join(', ')}. Use family names only (Claude, GPT, Gemini).`);
+  }
+
+  // 4. Check for Latin approximations instead of Greek symbols
+  const latinApproximations = ['tau node', 'lambda node', 'rho node', 'chi node', 'phi node', 'mu node'];
+  const foundApproximations = latinApproximations.filter(approx => fullText.includes(approx));
+  if (foundApproximations.length > 0) {
+    complianceDeductions += 0.05 * foundApproximations.length;
+    flags.push(`STYLE VIOLATION: Mentioned Latin approximations: ${foundApproximations.join(', ')}. Enforce Greek symbols (τ, λ, ρ, χ, φ, μ) instead.`);
+  }
+
+  // Apply deductions, clamping final score between 0 and 1
+  const finalScore = Math.max(0, totalScore - complianceDeductions);
+  const autoPublish = finalScore > 0.95;
 
   if (autoPublish) {
-    flags.push(`AUTO-PUBLISH: Score ${totalScore.toFixed(3)} exceeds 0.95 threshold`);
+    flags.push(`AUTO-PUBLISH: Score ${finalScore.toFixed(3)} exceeds 0.95 threshold`);
   } else {
-    flags.push(`DRAFT: Score ${totalScore.toFixed(3)} below 0.95 — τ-node review required`);
+    flags.push(`DRAFT: Score ${finalScore.toFixed(3)} below 0.95 — τ-node review required`);
   }
 
   return {
-    totalScore: Math.round(totalScore * 1000) / 1000,
+    totalScore: Math.round(finalScore * 1000) / 1000,
     autoPublish,
     dimensions: {
       lexicalAlignment: Math.round(lexicalAlignment * 1000) / 1000,
