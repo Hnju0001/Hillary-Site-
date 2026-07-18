@@ -38,6 +38,25 @@ const REQUIRED_SECTIONS = [
   'whyItMatters',
 ];
 
+// ── Copywriting & Voice Compliance Lists ─────────────────────────────────────
+const CANONICAL_MODEL_FAMILIES = ['gpt', 'claude', 'gemini', 'llama', 'deepseek', 'grok', 'perplexity', 'cohere', 'mistral', 'command'];
+const CANONICAL_MODEL_TIERS = ['sonnet', 'opus', 'haiku', 'flash', 'pro', 'ultra', 'turbo', 'instruct', 'r1', 'v3', 'mythos', 'fable'];
+const LATIN_SYMBOLS = ['tau', 'lambda', 'rho', 'chi', 'phi', 'mu', 'gamma', 'sigma', 'kappa'];
+
+const familiesPattern = CANONICAL_MODEL_FAMILIES.join('|');
+const tiersPattern = CANONICAL_MODEL_TIERS.join('|');
+const latinPattern = LATIN_SYMBOLS.join('|');
+
+const BANNED_MODEL_REGEX = new RegExp(
+  `\\b(${familiesPattern})[\\s-]*(?:[0-9]+(?:\\.[0-9]+)?(?:[a-z0-9-]+)*|${tiersPattern})(?:[-.]*[0-9a-z]+)*\\b|\\b(?:${tiersPattern})[\\s-]*[0-9]+(?:[-.]*[0-9a-z]+)*\\b`,
+  'gi'
+);
+
+const LATIN_APPROXIMATION_REGEX = new RegExp(
+  `\\b(${latinPattern})[\\s-]*node\\b`,
+  'gi'
+);
+
 export interface CoherenceReport {
   totalScore: number;
   autoPublish: boolean;
@@ -54,14 +73,18 @@ export interface CoherenceReport {
 
 export function scoreCoherence(entry: any): CoherenceReport {
   const flags: string[] = [];
-  const md = (entry.rawMarkdown || '').toLowerCase();
-  const title = (entry.title || '').toLowerCase();
-  const fullText = `${title} ${md}`;
+  
+  // Strip code blocks and inline code to prevent false positives in logs, comments, or snippets
+  const cleanMarkdown = (entry.rawMarkdown || '')
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`\n]+`/g, '');
+  const cleanTitle = (entry.title || '').toLowerCase();
+  const cleanText = `${cleanTitle} ${cleanMarkdown}`.toLowerCase();
 
   // ── Dimension 1: Lexical Alignment (0–1) ──────────────────────────────────
   // How many canonical terms does the entry reference?
   const matchedTerms = CANONICAL_TERMS.filter(term =>
-    fullText.includes(term.toLowerCase())
+    cleanText.includes(term.toLowerCase())
   );
   const lexicalAlignment = Math.min(matchedTerms.length / 5, 1.0);
   // 5+ canonical terms = full score
@@ -91,7 +114,7 @@ export function scoreCoherence(entry: any): CoherenceReport {
 
   // ── Dimension 4: Domain Coverage (0–1) ────────────────────────────────────
   // How many domains does the entry span?
-  const domains = inferDomainsFromText(fullText);
+  const domains = inferDomainsFromText(cleanText);
   const domainCoverage = Math.min(domains.length / 3, 1.0);
   // 3+ domains = full score
 
@@ -136,34 +159,32 @@ export function scoreCoherence(entry: any): CoherenceReport {
   // ── Style & Formatting Compliance Deductions (Voice Guide Alignment) ──────
   let complianceDeductions = 0;
   
-  // 1. Check for em-dashes (—)
-  if (entry.rawMarkdown?.includes('—') || entry.rawMarkdown?.includes('\u2014')) {
+  // 1. Check for em-dashes (—) outside of code blocks
+  if (cleanMarkdown.includes('—') || cleanMarkdown.includes('\u2014')) {
     complianceDeductions += 0.10;
     flags.push('STYLE VIOLATION: Contains forbidden em-dashes (—). Replace with colons, semicolons, or rewrite.');
   }
 
   // 2. Check for banned buzzwords
   const BANNED_BUZZWORDS = ['delve', 'tapestry', 'testament', 'revolutionize', 'paradigm shift', 'pivotal', 'leverage'];
-  const foundBuzzwords = BANNED_BUZZWORDS.filter(word => fullText.includes(word));
+  const foundBuzzwords = BANNED_BUZZWORDS.filter(word => cleanText.includes(word));
   if (foundBuzzwords.length > 0) {
     complianceDeductions += 0.10 * foundBuzzwords.length;
     flags.push(`STYLE VIOLATION: Contains prohibited AI buzzwords: ${foundBuzzwords.map(w => `"${w}"`).join(', ')}`);
   }
 
-  // 3. Check for specific model versions (e.g. GPT-4o, Sonnet 3.5)
-  const specificModelRegex = /\b(gpt-4|gpt-5|sonnet\s+\d+|gemini\s+\d+|claude\s+\d+)\b/gi;
-  const foundSpecificModels = fullText.match(specificModelRegex);
+  // 3. Check for specific model versions (e.g. GPT-4o, Sonnet 3.5, claude-sonnet-4-6)
+  const foundSpecificModels = cleanText.match(BANNED_MODEL_REGEX);
   if (foundSpecificModels) {
     complianceDeductions += 0.10;
-    flags.push(`STYLE VIOLATION: Referenced specific model versions: ${[...new Set(foundSpecificModels)].join(', ')}. Use family names only (Claude, GPT, Gemini).`);
+    flags.push(`STYLE VIOLATION: Referenced specific model versions: ${[...new Set(foundSpecificModels)].join(', ')}. Use family names only (Claude, GPT, Gemini, etc.).`);
   }
 
-  // 4. Check for Latin approximations instead of Greek symbols
-  const latinApproximations = ['tau node', 'lambda node', 'rho node', 'chi node', 'phi node', 'mu node'];
-  const foundApproximations = latinApproximations.filter(approx => fullText.includes(approx));
-  if (foundApproximations.length > 0) {
+  // 4. Check for Latin approximations instead of Greek symbols (e.g. tau-node, lambda node)
+  const foundApproximations = cleanText.match(LATIN_APPROXIMATION_REGEX);
+  if (foundApproximations) {
     complianceDeductions += 0.05 * foundApproximations.length;
-    flags.push(`STYLE VIOLATION: Mentioned Latin approximations: ${foundApproximations.join(', ')}. Enforce Greek symbols (τ, λ, ρ, χ, φ, μ) instead.`);
+    flags.push(`STYLE VIOLATION: Mentioned Latin approximations: ${[...new Set(foundApproximations)].join(', ')}. Enforce Greek symbols (τ, λ, ρ, χ, φ, μ) instead.`);
   }
 
   // Apply deductions, clamping final score between 0 and 1
