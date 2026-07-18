@@ -100,8 +100,8 @@ async function main() {
     const fileContent = renderMDX(signal);
     fs.writeFileSync(filePath, fileContent);
     crystallized++;
-    const scoreEmoji = coherenceReport.autoPublish ? '🟢' : '🟡';
-    console.log(`  ${scoreEmoji} ${signal.slug}: "${entry.title}" [score: ${coherenceReport.totalScore}${coherenceReport.autoPublish ? ' AUTO-PUBLISH' : ' DRAFT'}]`);
+    const scoreEmoji = signal.frontmatter.autoPublished ? '🟢' : '🟡';
+    console.log(`  ${scoreEmoji} ${signal.slug}: "${entry.title}" [score: ${signal.frontmatter.coherenceScore}${signal.frontmatter.autoPublished ? ' AUTO-PUBLISH' : ' DRAFT'}]`);
   }
 
   console.log(`\n✓ Crystallization complete: ${crystallized} signals written, ${skipped} skipped`);
