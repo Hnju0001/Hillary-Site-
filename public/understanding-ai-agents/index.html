@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Understanding AI Agents — A Field Guide</title>
+<meta name="description" content="A plain-English guide to AI agents: what they actually do, how they work, where they help, and where they fail. No technical background required.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --paper: #EDEFEA;
+  --paper-raised: #F8F9F5;
+  --paper-deep: #E4E7DE;
+  --ink: #16233A;
+  --ink-soft: #46566E;
+  --ink-faint: #7C879B;
+  --rule: #C9CDBF;
+  --rule-strong: #A9AE9C;
+  --stamp: #B23A2E;
+  --stamp-dark: #8B2C22;
+  --stamp-wash: #F3E1DD;
+  --teal: #2F6E62;
+  --teal-dark: #1F4B43;
+  --teal-wash: #E1EAE6;
+  --amber: #B4791F;
+  --amber-dark: #8C5E17;
+  --amber-wash: #F3E7D2;
+  --white: #FFFFFF;
+  --font-display: "Fraunces", serif;
+  --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "IBM Plex Mono", "SF Mono", Consolas, monospace;
+  --maxw: 780px;
+  --maxw-wide: 1040px;
+  --radius: 3px;
+  --shadow-card: 0 1px 2px rgba(22,35,58,0.06), 0 6px 20px rgba(22,35,58,0.05);
+}
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+body{
+  margin:0; background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+img,svg{ max-width:100%; display:block; }
+h1,h2,h3,h4{ font-family: var(--font-display); color: var(--ink); line-height: 1.15; margin: 0 0 0.5em 0; font-weight: 600; }
+p{ margin: 0 0 1.1em 0; }
+p:last-child{ margin-bottom:0; }
+a{ color: var(--teal-dark); text-decoration-thickness: 1px; }
+strong{ font-weight:600; color: var(--ink); }
+::selection{ background: var(--amber-wash); }
+:focus-visible{ outline: 3px solid var(--teal); outline-offset: 2px; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+.wrap-wide{ max-width: var(--maxw-wide); margin: 0 auto; padding: 0 24px; }
+
+/* ============================================================
+   TOP NAV
+   ============================================================ */
+.topnav{
+  position: sticky; top:0; z-index: 60;
+  background: rgba(237,239,234,0.92); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+}
+.topnav-inner{
+  max-width: var(--maxw-wide); margin:0 auto; padding: 12px 24px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+}
+.brandmark{
+  display:flex; align-items:center; gap:10px;
+  font-family: var(--font-mono); font-size:13px; letter-spacing:0.03em;
+  color: var(--ink); text-decoration:none;
+}
+.brandmark .dot{ width:9px; height:9px; border-radius:50%; background: var(--stamp); box-shadow: 0 0 0 3px var(--stamp-wash); }
+.nav-toggle{
+  font-family: var(--font-mono); font-size:12px; letter-spacing:0.04em;
+  background: var(--ink); color: var(--paper); border:none;
+  padding: 8px 14px; border-radius: var(--radius); cursor:pointer; text-transform: uppercase;
+}
+.nav-toggle:hover{ background: var(--teal-dark); }
+.progress-rail{ position: fixed; top:0; left:0; height:3px; background: var(--stamp); width:0%; z-index:70; transition: width 80ms linear; }
+
+/* ============================================================
+   TOC DRAWER
+   ============================================================ */
+.toc-drawer{ position: fixed; inset:0; z-index: 80; background: rgba(22,35,58,0.45); display:none; }
+.toc-drawer.open{ display:block; }
+.toc-panel{
+  position:absolute; top:0; right:0; height:100%;
+  width: min(420px, 92vw); background: var(--paper-raised);
+  border-left: 1px solid var(--rule); padding: 24px; overflow-y:auto;
+}
+.toc-panel-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 18px; }
+.toc-panel h2{ font-size: 1.1rem; margin:0; }
+.toc-close{ background:none; border:none; font-size: 1.4rem; cursor:pointer; color: var(--ink-soft); line-height:1; }
+.toc-list{ list-style:none; margin:0; padding:0; }
+.toc-list li{ border-bottom:1px solid var(--rule); }
+.toc-list a{
+  display:flex; gap:12px; align-items:baseline;
+  padding: 12px 2px; text-decoration:none; color: var(--ink); font-size: 0.95rem;
+}
+.toc-list a .n{ font-family: var(--font-mono); font-size:0.78rem; color: var(--stamp); flex:0 0 28px; }
+.toc-list a:hover .t{ text-decoration: underline; }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{ padding: 64px 0 40px; border-bottom: 1px solid var(--rule); position: relative; }
+.hero-eyebrow{
+  font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.08em;
+  color: var(--stamp); text-transform: uppercase; margin-bottom: 18px;
+  display:flex; align-items:center; gap:10px;
+}
+.hero-eyebrow::before{ content:""; width:26px; height:1px; background: var(--stamp); }
+.hero h1{ font-size: clamp(2.1rem, 5vw, 3.4rem); font-weight: 600; letter-spacing: -0.01em; max-width: 15ch; }
+.hero h1 em{ font-style: italic; font-weight:500; color: var(--teal-dark); }
+.hero-sub{ font-size: 1.18rem; color: var(--ink-soft); max-width: 46ch; margin-top: 14px; }
+.hero-meta{
+  display:flex; flex-wrap:wrap; gap: 22px; margin-top: 30px;
+  font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft);
+}
+.hero-meta span{ display:flex; align-items:center; gap:7px; }
+.hero-meta strong{ color:var(--ink); font-family:var(--font-body); font-weight:600; font-size:13px; }
+
+/* ============================================================
+   SECTIONS / FOLDER-TAB HEADERS
+   ============================================================ */
+.section{ padding: 76px 0; border-bottom: 1px solid var(--rule); }
+.section:last-of-type{ border-bottom:none; }
+.section-alt{ background: var(--paper-deep); }
+.folder-header{ margin-bottom: 40px; max-width: 640px; }
+.folder-tab{
+  display:inline-flex; align-items:center; gap:8px;
+  background: var(--ink); color: var(--paper);
+  font-family: var(--font-mono); font-size: 11.5px; letter-spacing:0.08em;
+  padding: 6px 12px 6px 10px; border-radius: 2px 2px 0 0; text-transform: uppercase;
+}
+.folder-tab .tab-icon{ width:12px; height:12px; }
+.folder-header h2{ font-size: clamp(1.6rem, 3.2vw, 2.2rem); border-top: 3px solid var(--ink); padding-top: 16px; margin-top:0; }
+.folder-header .dek{ color: var(--ink-soft); font-size: 1.05rem; max-width: 56ch; }
+.section-lede{ max-width: 68ch; font-size:1.05rem; }
+
+/* ============================================================
+   ICONS
+   ============================================================ */
+.icon{ width:1em; height:1em; display:inline-block; vertical-align:-0.15em; fill:currentColor; }
+.icon-lg{ width:22px; height:22px; }
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family: var(--font-mono); font-size: 11.5px; letter-spacing:0.03em;
+  padding: 4px 10px; border-radius: 20px; text-transform: uppercase; white-space:nowrap;
+}
+.badge svg{ width:12px; height:12px; }
+.badge--auto{ background: var(--teal-wash); color: var(--teal-dark); }
+.badge--review{ background: var(--amber-wash); color: var(--amber-dark); }
+.badge--escalate{ background: var(--stamp-wash); color: var(--stamp-dark); }
+.badge--human{ background: var(--ink); color: var(--paper); }
+.badge-key{
+  display:flex; flex-wrap:wrap; gap:10px 22px; align-items:center;
+  padding: 14px 18px; background: var(--paper-raised);
+  border:1px solid var(--rule); border-radius: var(--radius);
+  font-size: 0.88rem; color: var(--ink-soft); margin: 22px 0;
+}
+.badge-key strong{ font-family: var(--font-mono); font-size:11px; text-transform:uppercase; color:var(--ink-faint); letter-spacing:0.06em; margin-right:4px;}
+
+/* ============================================================
+   CALLOUTS
+   ============================================================ */
+.callout{
+  border-radius: var(--radius); padding: 20px 22px; margin: 28px 0;
+  border-left: 4px solid var(--ink); background: var(--paper-raised); box-shadow: var(--shadow-card);
+}
+.callout-label{
+  font-family: var(--font-mono); font-size: 11px; letter-spacing:0.08em;
+  text-transform: uppercase; margin-bottom:8px; display:block; color: var(--ink-soft);
+}
+.callout p:last-child{ margin-bottom:0; }
+.callout--define{ border-left-color: var(--ink); }
+.callout--define .callout-label{ color: var(--ink); }
+.callout--insight{ border-left-color: var(--teal); background: var(--teal-wash); }
+.callout--insight .callout-label{ color: var(--teal-dark); }
+.callout--warn{ border-left-color: var(--stamp); background: var(--stamp-wash); }
+.callout--warn .callout-label{ color: var(--stamp-dark); }
+
+/* ============================================================
+   CARDS / GRIDS
+   ============================================================ */
+.card-grid{ display:grid; gap:18px; margin: 30px 0; }
+.card-grid.cols-2{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+.card-grid.cols-3{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+@media (max-width: 720px){ .card-grid.cols-2, .card-grid.cols-3{ grid-template-columns: 1fr; } }
+.card{
+  background: var(--paper-raised); border:1px solid var(--rule);
+  border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow-card);
+}
+.card h4{
+  font-family: var(--font-mono); font-size: 12px; letter-spacing:0.05em;
+  text-transform: uppercase; color: var(--stamp); margin-bottom:10px;
+  display:flex; align-items:center; gap:8px;
+}
+.card h4 a{ color: inherit; text-decoration: underline; text-decoration-color: var(--rule-strong); text-underline-offset: 3px; }
+.card p{ font-size: 0.95rem; color: var(--ink-soft); }
+.card p strong{ color: var(--ink); }
+.card .term{ font-family: var(--font-display); font-size:1.25rem; color:var(--ink); margin-bottom:6px; font-weight:600;}
+.term-card{ position:relative; padding-left: 26px; }
+.term-card::before{ content: attr(data-n); position:absolute; left:0; top:22px; font-family: var(--font-mono); font-size:11px; color: var(--ink-faint); }
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.table-scroll{ overflow-x:auto; margin: 28px 0; border:1px solid var(--rule); border-radius: var(--radius); }
+table.compare{ width:100%; border-collapse: collapse; background: var(--paper-raised); font-size: 0.92rem; min-width: 640px; }
+table.compare caption{ text-align:left; padding:12px 16px; font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); border-bottom:1px solid var(--rule);}
+table.compare th, table.compare td{ padding: 12px 16px; text-align:left; border-bottom:1px solid var(--rule); vertical-align:top; }
+table.compare thead th{ font-family: var(--font-mono); font-size: 11.5px; text-transform: uppercase; letter-spacing:0.04em; background: var(--ink); color: var(--paper); border-bottom:none; }
+table.compare tbody tr:last-child td{ border-bottom:none; }
+table.compare tbody th{ font-weight:600; color:var(--ink); background: var(--paper-deep); white-space:nowrap; }
+table.compare td.hi{ background: var(--teal-wash); color: var(--teal-dark); font-weight:600; }
+table.compare td.lo{ color: var(--ink-faint); }
+
+/* ============================================================
+   DIAGRAMS
+   ============================================================ */
+.diagram{ background: var(--paper-raised); border:1px solid var(--rule); border-radius: var(--radius); padding: 28px 24px; margin: 30px 0; box-shadow: var(--shadow-card); }
+.diagram-label{ font-family: var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color: var(--ink-faint); margin-bottom: 20px; display:flex; justify-content:space-between; }
+.flow{ display:flex; flex-wrap:wrap; align-items:stretch; gap:0; }
+.flow-step{ flex: 1 1 150px; background: var(--paper); border:1px solid var(--rule); border-radius: var(--radius); padding: 14px 14px; position:relative; min-width:150px; }
+.flow-step .step-icon{ color: var(--ink-soft); margin-bottom:8px; }
+.flow-step h5{ font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:0.03em; margin:0 0 6px 0; color:var(--ink);}
+.flow-step p{ font-size:0.86rem; color:var(--ink-soft); margin:0; }
+.flow-arrow{ flex: 0 0 34px; display:flex; align-items:center; justify-content:center; color: var(--ink-faint); }
+@media (max-width: 700px){ .flow{ flex-direction:column; } .flow-arrow{ flex-direction:row; height:22px; transform:rotate(90deg); } }
+.flow-step.gate-auto{ border-color: var(--teal); }
+.flow-step.gate-review{ border-color: var(--amber); }
+.flow-step.gate-escalate{ border-color: var(--stamp); }
+.flow-step.human{ background: var(--ink); color: var(--paper); border-color:var(--ink); }
+.flow-step.human h5, .flow-step.human p{ color: var(--paper); }
+.flow-branch{ display:flex; flex-direction:column; gap:10px; flex:1 1 150px; min-width:150px; }
+
+/* confidence chart */
+.confidence-chart{ margin: 24px 0; }
+.confidence-chart svg{ width:100%; height:auto; font-family: var(--font-mono); }
+
+/* timeline bars */
+.timeline{ margin: 22px 0; }
+.timeline-row{ display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+.timeline-row .tl-label{ flex:0 0 128px; font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); }
+.timeline-row .tl-track{ flex:1; height:26px; background: var(--paper-deep); border-radius:3px; overflow:hidden; position:relative; }
+.timeline-row .tl-fill{ height:100%; display:flex; align-items:center; padding-left:10px; font-family:var(--font-mono); font-size:11.5px; color:var(--white); white-space:nowrap; }
+.timeline-row .tl-fill.before{ background: var(--stamp); }
+.timeline-row .tl-fill.after{ background: var(--teal); }
+
+/* quadrant matrix */
+.quadrant{ display:grid; grid-template-columns: 40px 1fr 1fr; grid-template-rows: auto 1fr 1fr; gap:8px; margin: 30px 0; }
+.q-axis-y{ grid-row: 2 / 4; display:flex; align-items:center; justify-content:center; }
+.q-axis-y span{ transform: rotate(-90deg); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-faint); white-space:nowrap; }
+.q-axis-x{ grid-column: 2 / 4; text-align:center; font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-faint); }
+.q-cell{ border:1px solid var(--rule); border-radius: var(--radius); padding:16px; background:var(--paper); min-height:150px; }
+.q-cell h5{ font-family:var(--font-mono); font-size:11.5px; text-transform:uppercase; margin:0 0 8px 0; letter-spacing:0.03em; }
+.q-cell p{ font-size:0.86rem; color:var(--ink-soft); margin:0; }
+.q-cell.good{ background: var(--teal-wash); border-color:var(--teal); }
+.q-cell.good h5{ color:var(--teal-dark); }
+.q-cell.bad{ background: var(--stamp-wash); border-color: var(--stamp); }
+.q-cell.bad h5{ color: var(--stamp-dark); }
+.q-cell.mixed{ background: var(--amber-wash); border-color:var(--amber); }
+.q-cell.mixed h5{ color:var(--amber-dark); }
+@media (max-width: 640px){ .quadrant{ grid-template-columns: 1fr; } .q-axis-y, .q-axis-x{ display:none; } }
+
+/* diagnostic tree */
+.tree{ margin: 30px 0; }
+.tree-q{ border:1px solid var(--rule); background:var(--paper-raised); border-radius: var(--radius); padding:16px 18px; margin-bottom:4px; }
+.tree-q .qnum{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); }
+.tree-q h5{ font-size:1rem; margin:4px 0 0 0; }
+.tree-branch{ display:flex; gap:10px; margin: 10px 0 26px 0; padding-left:18px; border-left:2px solid var(--rule); }
+.tree-branch .tb{ flex:1; font-size:0.88rem; padding:10px 14px; border-radius:var(--radius); }
+.tree-branch .tb.stop{ background: var(--stamp-wash); color:var(--stamp-dark); }
+.tree-branch .tb.go{ background: var(--teal-wash); color:var(--teal-dark); }
+
+/* myth/reality cards */
+.myth-card{ border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper-raised); margin: 26px 0; overflow:hidden; box-shadow: var(--shadow-card); }
+.myth-row{ display:grid; grid-template-columns: 120px 1fr; }
+.myth-row + .myth-row{ border-top:1px solid var(--rule); }
+.myth-stamp{ font-family: var(--font-mono); font-size:12px; letter-spacing:0.05em; text-transform:uppercase; padding: 16px 10px; text-align:center; display:flex; align-items:center; justify-content:center; border-right: 1px dashed var(--rule); }
+.myth-row.myth .myth-stamp{ color: var(--stamp-dark); }
+.myth-row.reality .myth-stamp{ color: var(--teal-dark); }
+.myth-body{ padding:16px 20px; }
+.myth-body p{ margin:0 0 0.6em 0; font-size:0.97rem; }
+.myth-why{ padding: 14px 20px; background: var(--paper-deep); font-size: 0.92rem; color: var(--ink-soft); border-top: 1px dashed var(--rule); }
+.myth-why strong{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-faint); display:block; margin-bottom:6px;}
+
+/* token strip */
+.token-strip{ display:flex; flex-wrap:wrap; gap:6px; margin:18px 0; }
+.token-chip{ font-family: var(--font-mono); font-size:12.5px; background: var(--paper); border:1px solid var(--rule-strong); border-radius:4px; padding:5px 9px; color:var(--ink-soft); }
+.token-chip.hi{ background: var(--amber-wash); border-color: var(--amber); color: var(--amber-dark); }
+
+/* structured output */
+.struct-compare{ display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin:24px 0; }
+@media (max-width:640px){ .struct-compare{ grid-template-columns:1fr; } }
+.struct-box{ border:1px solid var(--rule); border-radius:var(--radius); background:var(--paper-raised); overflow:hidden; }
+.struct-box h5{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; padding:10px 16px; margin:0; background:var(--paper-deep); color:var(--ink-soft); }
+.struct-box .body{ padding:16px; font-size:0.9rem; }
+.struct-box.prose .body{ color:var(--ink-soft); font-style:italic; line-height:1.6; }
+.struct-row{ display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px dashed var(--rule); font-family:var(--font-mono); font-size:0.83rem; }
+.struct-row:last-child{ border-bottom:none; }
+.struct-row .k{ color:var(--ink-faint); }
+.struct-row .v{ color:var(--ink); font-weight:600; text-align:right; }
+
+/* loop diagram */
+.loop-wrap{ display:flex; flex-wrap:wrap; align-items:center; gap:0; margin:24px 0; }
+.loop-return{ flex-basis:100%; display:flex; align-items:center; justify-content:center; gap:10px; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint); margin-top:14px; padding-top:14px; border-top:1px dashed var(--rule); }
+.loop-return svg{ transform:scaleX(-1); }
+
+/* scenario cards */
+.scenario-card{ border-radius: var(--radius); border:1px solid var(--rule); overflow:hidden; background: var(--paper-raised); box-shadow: var(--shadow-card); }
+.scenario-head{ padding:16px 20px; font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:0.05em; }
+.scenario-card.poor .scenario-head{ background:var(--stamp); color:var(--white); }
+.scenario-card.good .scenario-head{ background:var(--amber); color:var(--white); }
+.scenario-card.exceptional .scenario-head{ background:var(--teal); color:var(--white); }
+.scenario-body{ padding:18px 20px; }
+.scenario-body h4{ font-size:1.15rem; margin-bottom:8px; }
+.scenario-body p{ font-size:0.93rem; color:var(--ink-soft); }
+.scenario-body ul{ padding-left:18px; font-size:0.9rem; color:var(--ink-soft); margin:10px 0 0 0;}
+.scenario-body li{ margin-bottom:6px; }
+
+/* red flags */
+.redflag-list{ list-style:none; margin:24px 0; padding:0; display:grid; gap:12px; }
+.redflag-list li{ display:flex; gap:14px; padding:14px 16px; background:var(--paper-raised); border:1px solid var(--rule); border-left:3px solid var(--stamp); border-radius:var(--radius); font-size:0.94rem; }
+.redflag-list li .rf-icon{ flex:0 0 auto; color:var(--stamp); margin-top:3px; }
+.redflag-list li span.note{ color:var(--ink-soft); font-size:0.9rem; }
+
+/* evidence / speculation tags */
+.tag-evidence, .tag-speculation{ font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; padding:3px 8px; border-radius:20px; margin-right:8px; white-space:nowrap; }
+.tag-evidence{ background:var(--teal-wash); color:var(--teal-dark); }
+.tag-speculation{ background:var(--amber-wash); color:var(--amber-dark); }
+
+/* pullquote */
+.pullquote{ font-family: var(--font-display); font-style:italic; font-size:1.4rem; color:var(--ink); border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); padding: 24px 0; margin: 40px 0; max-width: 56ch; }
+
+/* FAQ accordion */
+.faq-item{ border-bottom:1px solid var(--rule); }
+.faq-item summary{ padding: 18px 4px; cursor:pointer; font-family: var(--font-display); font-weight:600; font-size: 1.05rem; list-style:none; display:flex; justify-content:space-between; gap:16px; align-items:baseline; }
+.faq-item summary::-webkit-details-marker{ display:none; }
+.faq-item summary::after{ content:"+"; font-family: var(--font-mono); color: var(--stamp); font-size:1.2rem; flex:0 0 auto; }
+.faq-item[open] summary::after{ content:"−"; }
+.faq-item .faq-a{ padding: 0 4px 20px 4px; color: var(--ink-soft); font-size:0.97rem; max-width: 62ch; }
+
+/* glossary */
+.glossary-letter{ font-family: var(--font-mono); font-size:12px; letter-spacing:0.1em; color:var(--stamp); margin: 30px 0 10px 0; padding-top:14px; border-top:1px solid var(--rule); }
+.glossary-letter:first-child{ border-top:none; margin-top:0; }
+dl.glossary{ margin:0; }
+dl.glossary dt{ font-family: var(--font-display); font-weight:600; font-size:1.05rem; margin-top:16px; color:var(--ink); }
+dl.glossary dd{ margin:4px 0 0 0; color: var(--ink-soft); font-size:0.94rem; max-width:62ch; }
+
+/* utility */
+.disclaimer{ font-size:0.85rem; color:var(--ink-faint); font-style:italic; margin-top:10px; max-width:56ch; }
+.divider-mini{ width:40px; height:3px; background:var(--stamp); margin: 26px 0; }
+.center{ text-align:center; }
+ul.plain, ol.plain{ padding-left: 22px; }
+ul.plain li, ol.plain li{ margin-bottom:8px; }
+
+/* footer */
+footer{ padding: 50px 0 70px; }
+footer .wrap{ max-width: var(--maxw-wide); }
+footer p{ color: var(--ink-soft); font-size:0.9rem; }
+.back-to-top{
+  display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12px;
+  text-transform:uppercase; letter-spacing:0.05em; color:var(--ink); text-decoration:none;
+  border:1px solid var(--ink); padding:8px 14px; border-radius:20px; margin-top:14px;
+}
+.back-to-top:hover{ background:var(--ink); color:var(--paper); }
+
+/* ============================================================
+   MICRO-EXAMPLE TICKET CARD (from Draft 1)
+   ============================================================ */
+.ticket{ border:1px solid var(--rule); border-radius: var(--radius); overflow:hidden; margin: 24px 0; background: var(--paper-raised); box-shadow: var(--shadow-card); }
+.ticket-head{ display:flex; justify-content:space-between; padding:10px 16px; font-family: var(--font-mono); font-size:12px; letter-spacing:0.04em; background: var(--paper-deep); border-bottom:1px solid var(--rule); }
+.ticket-status{ text-transform:uppercase; font-weight:600; }
+.ticket-status--resolved{ color: var(--teal-dark); }
+.ticket-status--escalated{ color: var(--stamp-dark); }
+.ticket-body{ padding:16px 18px; }
+.ticket-body .subj{ font-family: var(--font-display); font-weight:600; font-size:1.05rem; margin-bottom:8px; }
+.ticket-body .meta{ color: var(--ink-soft); font-size:0.93rem; line-height:1.65; }
+
+/* three-way comparison cards */
+.pill{ display:inline-block; font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.03em; padding:3px 10px; border-radius:20px; }
+.pill--red{ background:var(--stamp-wash); color:var(--stamp-dark); }
+.pill--blue{ background:var(--paper-deep); color:var(--ink-soft); }
+.pill--green{ background:var(--teal-wash); color:var(--teal-dark); }
+.pill--brass{ background:var(--amber-wash); color:var(--amber-dark); }
+
+@media (max-width: 640px){ .myth-row{ grid-template-columns: 1fr; } .myth-stamp{ border-right:none; border-bottom:1px dashed var(--rule); } }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     ICON SPRITE
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.2 14.4-3.8-3.8 1.4-1.4 2.4 2.4 5.6-5.6 1.4 1.4-7 7z"/></symbol>
+    <symbol id="icon-gate" viewBox="0 0 24 24"><path d="M12 2 22 12 12 22 2 12z"/></symbol>
+    <symbol id="icon-person" viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.4 0-9 2.2-9 5v3h18v-3c0-2.8-4.6-5-9-5z"/></symbol>
+    <symbol id="icon-flag" viewBox="0 0 24 24"><path d="M6 2h2v20H6zM8 3h11l-3 4 3 4H8z"/></symbol>
+    <symbol id="icon-node" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 11h13.2l-4.6-4.6L14 5l7 7-7 7-1.4-1.4 4.6-4.6H4z"/></symbol>
+    <symbol id="icon-stack" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5zM2 12l10 5 10-5M2 17l10 5 10-5"/></symbol>
+    <symbol id="icon-doc" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6zm9 1.5V8h4.5z"/></symbol>
+  </defs>
+</svg>
+
+<div class="progress-rail" id="progressRail"></div>
+
+<!-- ============================================================
+     TOP NAV
+     ============================================================ -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="#top" class="brandmark"><span class="dot"></span> FIELD GUIDE · AI AGENTS</a>
+    <button class="nav-toggle" id="tocToggle" aria-haspopup="true" aria-controls="tocDrawer">Contents</button>
+  </div>
+</nav>
+
+<div class="toc-drawer" id="tocDrawer">
+  <div class="toc-panel">
+    <div class="toc-panel-head">
+      <h2>Contents</h2>
+      <button class="toc-close" id="tocClose" aria-label="Close contents">&times;</button>
+    </div>
+    <ul class="toc-list">
+      <li><a href="#opening"><span class="n">00</span><span class="t">A Broken Headlamp — Why This Matters</span></a></li>
+      <li><a href="#exec-summary"><span class="n">01</span><span class="t">The Vocabulary You Need First</span></a></li>
+      <li><a href="#meet-meridian"><span class="n">02</span><span class="t">Meet Meridian Mutual — Life Before Agents</span></a></li>
+      <li><a href="#foundations"><span class="n">03</span><span class="t">Foundations — Tasks, Decisions, and Trust</span></a></li>
+      <li><a href="#what-is-ai"><span class="n">04</span><span class="t">What "AI" Actually Means</span></a></li>
+      <li><a href="#agent-anatomy"><span class="n">05</span><span class="t">The Anatomy of an Agent</span></a></li>
+      <li><a href="#after-agents"><span class="n">06</span><span class="t">Meridian Mutual, After Agents</span></a></li>
+      <li><a href="#five-systems"><span class="n">07</span><span class="t">Five Kinds of System, Compared</span></a></li>
+      <li><a href="#where-agents-fit"><span class="n">08</span><span class="t">Where Agents Excel — and Where They Don't</span></a></li>
+      <li><a href="#not-the-answer"><span class="n">09</span><span class="t">When an Agent Is the Wrong Tool</span></a></li>
+      <li><a href="#misconceptions"><span class="n">10</span><span class="t">Common Misconceptions</span></a></li>
+      <li><a href="#diagnostic"><span class="n">11</span><span class="t">Is an Agent Right for Your Problem?</span></a></li>
+      <li><a href="#road-ahead"><span class="n">12</span><span class="t">The Road Ahead</span></a></li>
+      <li><a href="#faq"><span class="n">13</span><span class="t">Frequently Asked Questions</span></a></li>
+      <li><a href="#glossary"><span class="n">14</span><span class="t">Glossary &amp; Reference</span></a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-eyebrow">A Field Guide, Not a Sales Pitch</div>
+    <h1>Understanding AI&nbsp;Agents:<br><em>what they actually do</em>, in plain English</h1>
+    <p class="hero-sub">Software that acts on your behalf, one claim, ticket, or transaction at a time — and the honest story of where that helps, where it doesn't, and how to tell the difference.</p>
+    <div class="hero-meta">
+      <span>&#9201; <strong>~40 minute read</strong></span>
+      <span>&#128206; <strong>No technical background required</strong></span>
+      <span>&#128451; <strong>Two running case studies throughout</strong></span>
+    </div>
+  </div>
+</header>
+<main>
+
+<!-- ============================================================
+     SECTION 00 — THE HUMAN ENTRY POINT (from Draft 1)
+     ============================================================ -->
+<section class="section" id="opening">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-doc"></use></svg> Section 00</span>
+      <h2>A broken headlamp — why this matters</h2>
+      <p class="dek">Before we define anything, here's the experience that makes the rest of this guide worth reading.</p>
+    </div>
+
+    <p class="section-lede">Cedar &amp; Pine Outfitters is a mid-size outdoor gear company. They sell tents, hiking boots, headlamps — the kind of gear people buy once, use hard, and expect to last. Their support inbox handles about 6,000 messages a week.</p>
+
+    <p class="disclaimer">Cedar &amp; Pine is a fictional, composite example. Its numbers are illustrative — chosen to be realistic, not copied from any single real company.</p>
+
+    <div class="ticket">
+      <div class="ticket-head"><span>TICKET #48213</span><span class="ticket-status ticket-status--resolved">RESOLVED</span></div>
+      <div class="ticket-body">
+        <div class="subj">"My headlamp won't turn on. I'd like a replacement."</div>
+        <div class="meta">Customer: M. Alvarez &middot; Order placed 11 days ago &middot; Product: Trail Pro 600 headlamp &middot; Channel: email</div>
+      </div>
+    </div>
+
+    <p><strong>Without an agent,</strong> this ticket sits in a queue. A support rep picks it up hours later, looks up the order, checks the warranty policy, confirms Alvarez qualifies, processes a replacement, and writes a reply. Time from receipt to resolution: roughly <strong>14 hours</strong>, almost all of it waiting in line.</p>
+
+    <p><strong>With an agent,</strong> the same ticket is read automatically. The agent pulls up order #48213, checks that the purchase was 11 days ago (well within the 30-day warranty), confirms the Trail Pro 600 is in stock, issues a replacement, and drafts a reply — all before a person would have opened it. Time: roughly <strong>4 minutes</strong>.</p>
+
+    <div class="callout callout--insight">
+      <span class="callout-label">The key distinction, before we go further</span>
+      <p>A chatbot could have <em>told</em> Alvarez what the warranty policy says. It could not have looked up the specific order, confirmed eligibility, or issued the replacement. <strong>An agent doesn't just answer. It acts</strong> — executing delegated procedural work within strict human-designed boundaries. That single difference — conversation versus action — is the subject of this entire guide.</p>
+    </div>
+
+    <h3>Watch the same request handled three ways</h3>
+    <div class="card-grid cols-3">
+      <div class="card">
+        <span class="pill pill--red">Automation</span>
+        <h4 style="margin-top:12px;">Fixed rule engine</h4>
+        <p>"If message contains 'won't turn on' AND category = electronics, send templated reply #14: 'Please try charging for 2 hours.'"</p>
+        <p><strong>No lookup. No judgment. Same reply regardless of order history or warranty status.</strong></p>
+      </div>
+      <div class="card">
+        <span class="pill pill--blue">Chatbot</span>
+        <h4 style="margin-top:12px;">Conversational, but hands-free</h4>
+        <p>Interprets the question flexibly and can explain the warranty policy clearly in plain language.</p>
+        <p><strong>But it cannot check the actual order, confirm eligibility, or issue anything. It ends with "please contact support."</strong></p>
+      </div>
+      <div class="card">
+        <span class="pill pill--green">AI Agent</span>
+        <h4 style="margin-top:12px;">Evaluates, then acts</h4>
+        <p>Reads the message, calls a tool to pull up the real order, calls another to check policy, decides Alvarez qualifies, and calls a third to actually issue the replacement.</p>
+        <p><strong>The difference isn't the conversation. It's that something changed in Cedar &amp; Pine's systems as a direct result.</strong></p>
+      </div>
+    </div>
+
+    <p>It's tempting to look at "14 hours" versus "4 minutes" and conclude agents are simply better. Hold that thought. That particular ticket — a defective item, clearly within policy, with no ambiguity — is close to the <em>best</em> case for an agent. Later in this guide, we'll follow a ticket from the same inbox where the agent makes things worse, not better. The honest picture requires both.</p>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 01 — EXECUTIVE SUMMARY / VOCABULARY
+     ============================================================ -->
+<section class="section section-alt" id="exec-summary">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-doc"></use></svg> Section 01</span>
+      <h2>The vocabulary you need first</h2>
+      <p class="dek">Nineteen words, in the order they need to be understood. Everything after this section leans on these definitions without re-explaining them.</p>
+    </div>
+
+    <div class="callout callout--define">
+      <span class="callout-label">A map for different readers</span>
+      <p><strong>In a hurry?</strong> Read this section, Section 02 (the case study), and Section 09 (when agents are the wrong tool). That gives you the shape of the whole argument in about ten minutes.<br>
+      <strong>Want the full picture?</strong> Read it in order. Each section assumes you've read the ones before it.</p>
+    </div>
+
+    <!-- Levels of Agency Diagram -->
+    <div class="diagram" style="margin:30px 0;">
+      <div class="diagram-label"><span>Levels of Agency — From Simple Rules to Coordinated Teams</span><span>5 capability levels governed by human oversight</span></div>
+      <div class="flow" style="gap:6px;">
+        <div class="flow-step" style="flex:1 1 130px; min-width:130px; padding:10px 12px;"><span class="pill pill--blue" style="font-size:10px; margin-bottom:4px;">Level 1</span><h5 style="font-size:11px; margin:4px 0 2px 0;">Traditional Software</h5><p style="font-size:0.8rem;">Fixed, hardcoded rules.</p></div>
+        <div class="flow-arrow" style="flex:0 0 16px;"><svg class="icon"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step" style="flex:1 1 130px; min-width:130px; padding:10px 12px;"><span class="pill pill--blue" style="font-size:10px; margin-bottom:4px;">Level 2</span><h5 style="font-size:11px; margin:4px 0 2px 0;">Automation</h5><p style="font-size:0.8rem;">Triggered rule execution.</p></div>
+        <div class="flow-arrow" style="flex:0 0 16px;"><svg class="icon"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step" style="flex:1 1 130px; min-width:130px; padding:10px 12px;"><span class="pill pill--brass" style="font-size:10px; margin-bottom:4px;">Level 3</span><h5 style="font-size:11px; margin:4px 0 2px 0;">AI Assistant</h5><p style="font-size:0.8rem;">Answers &amp; drafts text.</p></div>
+        <div class="flow-arrow" style="flex:0 0 16px;"><svg class="icon"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step gate-auto" style="flex:1 1 130px; min-width:130px; padding:10px 12px;"><span class="pill pill--green" style="font-size:10px; margin-bottom:4px;">Level 4</span><h5 style="font-size:11px; margin:4px 0 2px 0;">AI Agent</h5><p style="font-size:0.8rem;">Evaluates &amp; acts with tools.</p></div>
+        <div class="flow-arrow" style="flex:0 0 16px;"><svg class="icon"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step gate-review" style="flex:1 1 130px; min-width:130px; padding:10px 12px;"><span class="pill pill--green" style="font-size:10px; margin-bottom:4px;">Level 5</span><h5 style="font-size:11px; margin:4px 0 2px 0;">Multi-Agent</h5><p style="font-size:0.8rem;">Coordinated specialist team.</p></div>
+      </div>
+      <div class="callout callout--define" style="margin-top:14px; margin-bottom:0; padding:10px 14px; background:var(--ink); color:var(--paper); border-left-color:var(--stamp);">
+        <span class="callout-label" style="color:var(--paper-deep); font-size:10.5px;">Governing Layer &middot; Human Authority</span>
+        <p style="font-size:0.85rem; color:var(--paper-deep); margin:0;">Human authority is not a sixth stage at the end of a line — it is the governing framework surrounding all five levels, retaining final judgment, policy oversight, and escalation control.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px;">Cluster A — The building blocks (nothing here is specific to AI)</h3>
+    <div class="card-grid cols-2">
+      <div class="card term-card" data-n="01"><h4><a href="#gloss-software">Software</a></h4><p>Any set of instructions a computer follows. A calculator app, a spreadsheet, and a website are all software. Software does exactly what it was written to do — no more, no less.</p></div>
+      <div class="card term-card" data-n="02"><h4><a href="#gloss-automation">Automation</a></h4><p>Software written specifically to carry out a task without a person clicking through each step. A nightly script that backs up a database is automation. It follows fixed rules — it doesn't decide anything.</p></div>
+      <div class="card term-card" data-n="03"><h4><a href="#gloss-ai">Artificial Intelligence (AI)</a></h4><p>Software that is trained on examples rather than told exact rules, so it can recognize patterns in new situations it hasn't seen before. Instead of "if the total is over $500, flag it," an AI system learns what a suspicious claim tends to look like.</p></div>
+      <div class="card term-card" data-n="04"><h4><a href="#gloss-workflow">Workflow</a></h4><p>The full sequence of steps needed to get something done, from start to finish — filing a claim, onboarding an employee, shipping an order. A workflow can involve people, software, and AI agents.</p></div>
+    </div>
+
+    <h3 style="margin-top:44px;">Cluster B — How a language model "reads" and "writes"</h3>
+    <div class="card-grid cols-2">
+      <div class="card term-card" data-n="05"><h4><a href="#gloss-llm">Large Language Model (LLM)</a></h4><p>A specific kind of AI, trained on enormous amounts of text, whose core skill is predicting what text should come next. That one skill — done extremely well — turns out to be powerful enough to answer questions, summarize documents, and draft replies. It is <strong>not</strong> the same thing as an AI agent; it's usually one component <em>inside</em> one.</p></div>
+      <div class="card term-card" data-n="06"><h4><a href="#gloss-token">Tokens</a></h4><p>The small chunks — often pieces of words — that a language model actually reads and writes. "Kitchen ceiling" might become two or three tokens. The model doesn't see letters or sentences the way you do; it sees a long string of these chunks and predicts the next one.</p></div>
+      <div class="card term-card" data-n="07"><h4><a href="#gloss-context">Context Window</a></h4><p>The maximum number of tokens a model can "hold in view" at one time — its instructions, the conversation so far, any documents it's been given. Think of it as desk space: even a big desk eventually runs out of room.</p></div>
+      <div class="card term-card" data-n="08"><h4><a href="#gloss-prompt">Prompt</a></h4><p>The instructions and information you give a model before it responds. In agents, prompts are usually written by whoever built the system, not typed fresh each time.</p></div>
+    </div>
+
+    <div class="callout callout--warn">
+      <span class="callout-label">One honest caveat, early</span>
+      <p>Language models sometimes produce confident, fluent, completely wrong answers. This is called <strong><a href="#gloss-hallucination">hallucination</a></strong>. It isn't a rare glitch — it's a natural side effect of how these models work: they're predicting plausible next words, not consulting a database of facts. We'll come back to this repeatedly.</p>
+    </div>
+
+    <h3 style="margin-top:44px;">Cluster C — How a system actually reaches out and does something</h3>
+    <div class="card-grid cols-2">
+      <div class="card term-card" data-n="09"><h4><a href="#gloss-api">API</a></h4><p>Short for "Application Programming Interface" — a defined way for one piece of software to ask another to do something, without a human clicking buttons. When Cedar &amp; Pine's agent checks an order, an API is how that request travels.</p></div>
+      <div class="card term-card" data-n="10"><h4><a href="#gloss-tool">Tool</a></h4><p>In agent terminology, a "tool" is a specific capability made available to an AI system through an API — "look up this order," "check the weather on this date," "send this email." An agent can only use the tools it's been explicitly given.</p></div>
+      <div class="card term-card" data-n="11"><h4><a href="#gloss-retrieval">Retrieval</a></h4><p>Fetching a specific, current fact from an outside source — a database, a document, a live record — instead of relying on whatever the model absorbed during training. Retrieval is one of the main defenses against hallucination.</p></div>
+      <div class="card term-card" data-n="12"><h4><a href="#gloss-structured">Structured Output</a></h4><p>Getting a model to answer in a fixed, predictable format — a filled-in form with named fields — rather than a paragraph. "Claim number: 88213, Damage type: water" is structured. A structured answer can be read directly by other software.</p></div>
+    </div>
+
+    <h3 style="margin-top:44px;">Cluster D — How an agent is actually built and coordinated</h3>
+
+    <div class="callout callout--insight" style="margin-top:24px;">
+      <span class="callout-label">13 &middot; The term this whole guide is about</span>
+      <p><strong><a href="#gloss-agent" style="color:inherit;">AI Agent</a>:</strong> a system that combines a language model with a defined set of tools, and is allowed to take more than one step — deciding what to do, doing it, checking the result, and deciding what to do next — in pursuit of a goal, within boundaries a person designed in advance. The key shift: an agent doesn't just answer you. It <strong>acts</strong>, across multiple steps, usually touching real systems along the way.</p>
+    </div>
+
+    <div class="card-grid cols-2" style="margin-top:22px;">
+      <div class="card term-card" data-n="14"><h4><a href="#gloss-loop">Loop</a></h4><p>The repeating cycle inside an agent's work: think about what to do, do it, look at what happened, decide what to do next. One ticket might take an agent through this loop five or six times.</p></div>
+      <div class="card term-card" data-n="15"><h4><a href="#gloss-harness">Harness</a></h4><p>The surrounding code that manages the loop responsibly: how many times it's allowed to repeat, what happens if a tool fails, when to give up and hand off to a person. If the loop is the engine, the harness is the brakes and seatbelt.</p></div>
+      <div class="card term-card" data-n="16"><h4><a href="#gloss-memory">Memory</a></h4><p><em>Short-term</em> memory is what happened earlier in this same task. <em>Longer-term</em> memory is information retrieved from storage between separate tasks. Neither kind means the model "learned" anything permanently.</p></div>
+      <div class="card term-card" data-n="17"><h4><a href="#gloss-orchestration">Orchestration</a></h4><p>The logic that decides, across a whole workflow, which agent runs when — what happens first, what runs in parallel, what triggers a handoff to a person. If individual agents are specialists, orchestration is the schedule that makes them work together.</p></div>
+    </div>
+
+    <div class="card-grid cols-2" style="margin-top:0;">
+      <div class="card term-card" data-n="18"><h4><a href="#gloss-multi-agent">Multi-Agent System</a></h4><p>Several specialized agents, each with a narrow job and its own small set of tools, coordinated by an orchestration layer. This is what we'll see inside Meridian Mutual — not one all-powerful agent, but several modest ones working in sequence.</p></div>
+      <div class="card term-card" data-n="19"><h4><a href="#gloss-mcp">MCP (Model Context Protocol)</a></h4><p>A shared, open standard that lets AI systems connect to tools in one consistent way rather than needing custom wiring for every connection. Engineers describe it as "a USB-C port for AI" — one connector instead of a drawer of incompatible cables.</p></div>
+    </div>
+
+    <p style="margin-top:36px;">Nineteen terms, four clusters, one direction of travel: from <em>plain software</em>, to <em>a model that can read and write</em>, to <em>a system that can reach out and act</em>, to <em>several such systems working together</em>. Keep that direction in mind — it's the spine of everything that follows.</p>
+
+    <div class="callout callout--insight" style="margin-top:24px;">
+      <span class="callout-label">&#128161; If you only remember one thing about agents</span>
+      <p>An AI agent isn't defined by conversational fluency — it's defined by <strong>delegated action</strong>. It takes a goal, uses tools to execute multi-step workflows, and operates strictly within boundaries designed and governed by humans.</p>
+    </div>
+
+    <div class="callout callout--define" style="margin-top:20px;">
+      <span class="callout-label">From headlamp to hurricane</span>
+      <p>Cedar &amp; Pine's headlamp ticket showed what a single agent can do for a single customer. The same principles — tools, loops, confidence, escalation — operate at much larger scales. The next section introduces an organization where that scale becomes the whole point.</p>
+    </div>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 02 — MEET MERIDIAN MUTUAL
+     ============================================================ -->
+<section class="section" id="meet-meridian">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-stack"></use></svg> Section 02</span>
+      <h2>Meet Meridian Mutual — life before agents</h2>
+      <p class="dek">Every concept in this guide will now be tested against one recurring situation. Here's the situation.</p>
+    </div>
+
+    <p class="section-lede">It's the end of August. A category-3 hurricane has just moved through a coastal region where Meridian Mutual insures roughly 40,000 homes. Within 48 hours, <strong>5,000 claims</strong> arrive. Meridian's normal team can process about 800 claims a week. This is more than a month's workload arriving in two days.</p>
+
+    <p class="disclaimer">Meridian Mutual is a fictional, composite example. Its numbers are illustrative — chosen to be realistic, not copied from any single real insurer's disclosed figures.</p>
+
+    <div class="diagram">
+      <div class="diagram-label"><span>Fig. 1 — The manual claims process, before any AI</span><span>7 stages, almost entirely human</span></div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-icon"><svg class="icon-lg"><use href="#icon-doc"></use></svg></div><h5>1 &middot; Intake</h5><p>A clerk keys each claim into the system by hand.</p></div>
+        <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step"><div class="step-icon"><svg class="icon-lg"><use href="#icon-stack"></use></svg></div><h5>2 &middot; File Assembled</h5><p>Documents and photos are attached to a case file.</p></div>
+        <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step"><div class="step-icon"><svg class="icon-lg"><use href="#icon-node"></use></svg></div><h5>3 &middot; Queue</h5><p>The file waits its turn. During a surge, days disappear here.</p></div>
+        <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step"><div class="step-icon"><svg class="icon-lg"><use href="#icon-person"></use></svg></div><h5>4 &middot; Adjuster Review</h5><p>A person checks the policy, reviews photos, estimates damage.</p></div>
+        <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step gate-escalate"><div class="step-icon"><svg class="icon-lg"><use href="#icon-flag"></use></svg></div><h5>5 &middot; Fraud Referral</h5><p>If something feels off, the adjuster flags it.</p></div>
+        <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step human"><div class="step-icon"><svg class="icon-lg"><use href="#icon-person"></use></svg></div><h5>6 &middot; Manager Sign-off</h5><p>A manager approves the payout before money moves.</p></div>
+        <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step gate-auto"><div class="step-icon"><svg class="icon-lg"><use href="#icon-check"></use></svg></div><h5>7 &middot; Payment</h5><p>Funds are released to the policyholder.</p></div>
+      </div>
+    </div>
+
+    <p>Nothing about this process is unreasonable in ordinary times. The problem is <strong>volume</strong>: every stage requires a person's attention, and during the surge, the queue at Stage 3 stretches from hours to <strong>three to six weeks</strong>.</p>
+
+    <div class="card-grid cols-3">
+      <div class="card"><h4><svg class="icon"><use href="#icon-node"></use></svg> Speed</h4><p>Customers whose homes are damaged wait weeks for an answer, at the exact moment they need money for repairs.</p></div>
+      <div class="card"><h4><svg class="icon"><use href="#icon-person"></use></svg> Strain</h4><p>Adjusters work sustained overtime, reviewing far more files per day than the role was designed for.</p></div>
+      <div class="card"><h4><svg class="icon"><use href="#icon-flag"></use></svg> Consistency</h4><p>Tired, rushed reviewers are more likely to miss a real fraud pattern — or misjudge a legitimate one.</p></div>
+    </div>
+
+    <p>This is the situation the rest of this guide keeps returning to. It's a specific, recognizable bottleneck: <strong>too many structured, repetitive decisions, arriving faster than the people who make them can keep up.</strong></p>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 03 — FOUNDATIONS
+     ============================================================ -->
+<section class="section section-alt" id="foundations">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-gate"></use></svg> Section 03</span>
+      <h2>Foundations — tasks, decisions, and trust</h2>
+      <p class="dek">Before we talk about AI at all, we need four ideas that have nothing to do with AI. They're about how work is structured.</p>
+    </div>
+
+    <h3>3.1 — Answering is not the same as acting</h3>
+    <p>This is the single cleanest way to tell a chatbot from an agent, and we saw it in Cedar &amp; Pine's headlamp ticket.</p>
+
+    <div class="table-scroll">
+      <table class="compare">
+        <caption>A chatbot responds. An agent does something.</caption>
+        <thead><tr><th></th><th>A Chatbot</th><th>An AI Agent</th></tr></thead>
+        <tbody>
+          <tr><th>What it produces</th><td>Information — an answer to a question</td><td>A completed step — something changes in the world</td></tr>
+          <tr><th>Meridian example</th><td>"Your claim status is: pending review."</td><td>Verifies the policy, checks weather records, scores fraud risk, calculates an estimate, and routes the file — then reports what it did.</td></tr>
+          <tr><th>Cedar &amp; Pine example</th><td>"Our return policy covers items within 30 days."</td><td>Looks up the actual order, confirms the headlamp was purchased 11 days ago, verifies stock, issues a replacement, and drafts a reply to Alvarez.</td></tr>
+          <tr><th>Who initiates each step</th><td>You do — one question, one answer, repeat</td><td>The system does, until it's done or stuck</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:40px;">3.2 — Not all decisions deserve equal trust</h3>
+    <p>A well-built system doesn't just produce a decision — it produces a decision <em>plus</em> a sense of how sure it is. That confidence level determines what happens next:</p>
+
+    <div class="badge-key">
+      <strong>Key</strong>
+      <span class="badge badge--auto"><svg><use href="#icon-check"></use></svg> Autonomous</span>
+      <span class="badge badge--review"><svg><use href="#icon-flag"></use></svg> Flagged for review</span>
+      <span class="badge badge--escalate"><svg><use href="#icon-gate"></use></svg> Escalated</span>
+      <span class="badge badge--human"><svg><use href="#icon-person"></use></svg> Human decides</span>
+    </div>
+
+    <div class="confidence-chart">
+      <svg viewBox="0 0 640 170" role="img" aria-label="A confidence threshold chart showing three zones: Escalate (0-50%), Flag for Review (50-80%), and Autonomous (80-100%).">
+        <rect x="40" y="24" width="290" height="96" fill="var(--stamp-wash)"></rect>
+        <rect x="330" y="24" width="174" height="96" fill="var(--amber-wash)"></rect>
+        <rect x="504" y="24" width="116" height="96" fill="var(--teal-wash)"></rect>
+        <text x="185" y="42" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;" fill="var(--stamp-dark)">ESCALATE</text>
+        <text x="417" y="42" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;" fill="var(--amber-dark)">FLAG FOR REVIEW</text>
+        <text x="562" y="42" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;" fill="var(--teal-dark)">AUTONOMOUS</text>
+        <line x1="40" y1="120" x2="620" y2="120" stroke="var(--ink-faint)" stroke-width="1"></line>
+        <g style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;" fill="var(--ink-faint)">
+          <text x="40" y="138">0%</text>
+          <text x="323" y="138">50%</text>
+          <text x="497" y="138">80%</text>
+          <text x="608" y="138">100%</text>
+        </g>
+        <circle cx="156" cy="88" r="6" fill="var(--ink)" stroke="var(--paper-raised)" stroke-width="2"></circle>
+        <text x="156" y="73" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;" fill="var(--ink)">Event unconfirmed — 20%</text>
+        <circle cx="400" cy="63" r="6" fill="var(--ink)" stroke="var(--paper-raised)" stroke-width="2"></circle>
+        <text x="400" y="48" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;" fill="var(--ink)">Fraud risk — 62%</text>
+        <circle cx="550" cy="88" r="6" fill="var(--ink)" stroke="var(--paper-raised)" stroke-width="2"></circle>
+        <text x="550" y="73" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;" fill="var(--ink)">Damage estimate — 88%</text>
+        <circle cx="603" cy="63" r="6" fill="var(--ink)" stroke="var(--paper-raised)" stroke-width="2"></circle>
+        <text x="600" y="48" text-anchor="end" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;" fill="var(--ink)">Policy lookup — 97%</text>
+      </svg>
+    </div>
+
+    <p style="font-size:0.92rem;color:var(--ink-soft);margin-top:16px;">A note of realism: these confidence percentages are not automatically reliable. A model's own certainty scores tend to be poorly calibrated out of the box — they must be tested against real outcomes and adjusted before they can be trusted for routing decisions in production.</p>
+
+    <div class="callout callout--insight">
+      <span class="callout-label">The idea underneath all of this</span>
+      <p>A good agent isn't one that's always right. It's one that <strong>knows when it might be wrong</strong>, and routes exactly those cases to a person — while handling the confident, low-risk majority on its own.</p>
+    </div>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 04 — WHAT "AI" ACTUALLY MEANS
+     ============================================================ -->
+<section class="section" id="what-is-ai">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-node"></use></svg> Section 04</span>
+      <h2>What "AI" actually means</h2>
+      <p class="dek">Before we can talk about what an agent does, we need to be honest about what's happening inside the "AI" part.</p>
+    </div>
+
+    <h3>4.1 — Rules versus patterns</h3>
+    <p>Ordinary software follows rules a person wrote: <em>if the claim total is over $10,000, require manager approval</em>. AI works differently. Instead of being told the rule, it's shown thousands of past examples and learns, statistically, what pattern of features tends to go with which label. It doesn't "understand" fraud the way an experienced adjuster does. It recognizes that claims with certain combinations of traits <em>resemble</em> past fraudulent claims. That's a real and useful capability. It is not the same thing as judgment.</p>
+
+    <h3 style="margin-top:40px;">4.2 — LLMs: one very capable tool, not the whole toolbox</h3>
+    <p>A large language model's one core skill is predicting the next chunk of text. Trained on enough text, that single skill becomes remarkably general — it can draft messages, summarize documents, or extract specific details from free-form writing. These are pattern-based systems capable of producing reasoning-like behaviour — not conscious thinkers, but far more capable than simple autocomplete.</p>
+
+    <p>Here's roughly what the model sees when a customer types: <em>"Water came through the kitchen ceiling during the storm and ruined the cabinets."</em></p>
+
+    <div class="token-strip">
+      <span class="token-chip">Water</span><span class="token-chip"> came</span><span class="token-chip"> through</span><span class="token-chip"> the</span><span class="token-chip hi"> kitchen</span><span class="token-chip hi"> ceiling</span><span class="token-chip"> during</span><span class="token-chip"> the</span><span class="token-chip hi"> storm</span><span class="token-chip"> and</span><span class="token-chip"> ruined</span><span class="token-chip"> the</span><span class="token-chip hi"> cabinets</span><span class="token-chip">.</span>
+    </div>
+    <p style="font-size:0.9rem;color:var(--ink-soft);">Highlighted chips are the fragments that matter most for extracting "damage location" and "damage type" into a structured form.</p>
+
+    <div class="callout callout--warn">
+      <span class="callout-label">Hallucination, made concrete</span>
+      <p>Suppose the claim form says the incident happened on <strong>July 5</strong>, but is a little smudged. A language model reading it might confidently extract <strong>"July 15."</strong> It isn't lying — it's producing the most statistically plausible reading, and in this case, the plausible reading is wrong. This is why every date, dollar figure, and policy number the model reads gets checked against the actual source record — a discipline called <strong>retrieval</strong>.</p>
+    </div>
+
+    <h3 style="margin-top:40px;">4.3 — So what is "intelligence," here, really?</h3>
+    <p>Precise, narrow pattern recognition, applied consistently, at a scale no group of humans could sustain — not judgment, values, or understanding. That's a genuinely useful thing to have. It is also a fundamentally different thing than what the word "intelligent" suggests to most people.</p>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 05 — ANATOMY OF AN AGENT
+     ============================================================ -->
+<section class="section section-alt" id="agent-anatomy">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-gate"></use></svg> Section 05</span>
+      <h2>The anatomy of an agent</h2>
+      <p class="dek">An agent is not one clever algorithm. It's several plain engineering pieces, assembled deliberately.</p>
+    </div>
+
+    <h3>5.1 — Tools and APIs: what an agent is actually allowed to touch</h3>
+    <p>An agent can only do what it's been given a <strong>tool</strong> for. Meridian's engineers deliberately restricted each specialized agent to a short, specific list. This is a security decision as much as a design one: an agent that can only read the weather database can't accidentally authorize a payment.</p>
+
+    <div class="table-scroll">
+      <table class="compare">
+        <caption>Fig. 2 — Which tools each specialized agent can reach</caption>
+        <thead><tr><th>Agent</th><th>Claim Form</th><th>Policy DB</th><th>Weather</th><th>Fraud Models</th><th>Damage Models</th><th>Payment</th></tr></thead>
+        <tbody>
+          <tr><th>Intake</th><td class="hi">&#10003;</td><td class="lo">—</td><td class="lo">—</td><td class="lo">—</td><td class="lo">—</td><td class="lo">—</td></tr>
+          <tr><th>Coverage</th><td class="lo">—</td><td class="hi">&#10003;</td><td class="lo">—</td><td class="lo">—</td><td class="lo">—</td><td class="lo">—</td></tr>
+          <tr><th>Event Confirm</th><td class="lo">—</td><td class="lo">—</td><td class="hi">&#10003;</td><td class="lo">—</td><td class="lo">—</td><td class="lo">—</td></tr>
+          <tr><th>Fraud Detection</th><td class="lo">—</td><td class="lo">—</td><td class="lo">—</td><td class="hi">&#10003;</td><td class="lo">—</td><td class="lo">—</td></tr>
+          <tr><th>Assessment</th><td class="lo">—</td><td class="lo">—</td><td class="lo">—</td><td class="lo">—</td><td class="hi">&#10003;</td><td class="lo">—</td></tr>
+          <tr><th>Human Adjuster</th><td colspan="6" style="text-align:center;color:var(--ink-soft);font-family:var(--font-mono);font-size:0.85rem;">reviews everything &middot; the only role with payment authority</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.92rem;color:var(--ink-soft);">Notice that <em>no agent</em> has access to the payment system. That's not an oversight — it's the whole point.</p>
+
+    <div class="callout callout--insight" style="margin-top:20px;">
+      <span class="callout-label">&#128161; If you only remember one thing about tools</span>
+      <p>Tools are an agent's hands. An agent cannot touch any system or data source it hasn't been explicitly given an API tool for — limiting tool access is our primary way to keep agents secure.</p>
+    </div>
+
+    <h3 style="margin-top:44px;">5.2 — The loop: think, act, observe, repeat</h3>
+    <div class="diagram">
+      <div class="diagram-label"><span>Fig. 3 — One agent's loop, for a single claim</span><span>repeats until confident, or until it escalates</span></div>
+      <div class="loop-wrap">
+        <div class="flow">
+          <div class="flow-step"><h5>Think</h5><p>What does this claim still need?</p></div>
+          <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+          <div class="flow-step"><h5>Act</h5><p>Call a tool — e.g., pull this customer's claims history.</p></div>
+          <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+          <div class="flow-step"><h5>Observe</h5><p>Read what the tool returned.</p></div>
+          <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+          <div class="flow-step gate-review"><h5>Decide</h5><p>Confident enough? Or loop again?</p></div>
+        </div>
+        <div class="loop-return"><svg class="icon"><use href="#icon-arrow"></use></svg> not yet confident — loop back to "Think" (up to a limit set by the harness)</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px;">5.3 — Structured output: forms, not paragraphs</h3>
+    <div class="struct-compare">
+      <div class="struct-box prose">
+        <h5>Unstructured (model's default)</h5>
+        <div class="body">"Based on the form, it looks like this is a water damage claim affecting the kitchen ceiling and cabinets, which the customer says happened during the storm — possibly early this month."</div>
+      </div>
+      <div class="struct-box">
+        <h5>Structured (what the next agent receives)</h5>
+        <div class="body">
+          <div class="struct-row"><span class="k">claim_id</span><span class="v">88213</span></div>
+          <div class="struct-row"><span class="k">damage_type</span><span class="v">water</span></div>
+          <div class="struct-row"><span class="k">location</span><span class="v">kitchen ceiling</span></div>
+          <div class="struct-row"><span class="k">incident_date</span><span class="v">2026-08-27</span></div>
+          <div class="struct-row"><span class="k">confidence</span><span class="v">91%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px;">5.4 — Memory: two very different things</h3>
+    <div class="card-grid cols-2">
+      <div class="card"><h4>Short-term (within one claim)</h4><p>The Assessment agent doesn't re-ask for the policy number the Intake agent already extracted — it's carried forward as working context. This disappears once the claim is finished.</p></div>
+      <div class="card"><h4>Longer-term (across many claims)</h4><p>The Fraud Detection agent can retrieve <em>this customer's</em> claim history from storage, going back years. This is retrieval against a database, not the model "remembering."</p></div>
+    </div>
+    <p>Neither kind means the system is learning in the sense a person learns from experience. Models are not continuously retrained from every interaction. What <em>does</em> improve over time is the surrounding system: engineers refine prompts, tune confidence thresholds, update retrieval databases, and tighten harness rules based on observed performance. This is genuine, meaningful improvement — but it is engineered, not experienced.</p>
+
+    <div class="callout callout--insight" style="margin-top:20px;">
+      <span class="callout-label">&#128161; If you only remember one thing about memory</span>
+      <p>Agents don't "remember" or learn permanently from experience. They carry working notes in short-term context and look up records in long-term databases — fetching verified facts to prevent hallucination.</p>
+    </div>
+
+    <h3 style="margin-top:44px;">5.5 — The harness: the car around the engine</h3>
+    <p>Left unsupervised, a loop could repeat forever, call a failing tool over and over, or spiral. The <strong>harness</strong> is the code wrapped around the loop that prevents that: a cap on repeats, a timeout if a tool doesn't respond, a rule that says "after three failed attempts, stop and escalate." None of this is intelligence — it's engineering discipline.</p>
+
+    <h3 style="margin-top:44px;">5.6 — Orchestration: the schedule that makes specialists behave like a team</h3>
+    <div class="callout callout--define">
+      <span class="callout-label">Meridian's orchestration logic, in plain language</span>
+      <p>1. Run Intake. If the form is unreadable, stop and ask a person to key it in.<br>
+      2. Run Coverage Verification. If the policy doesn't cover this, deny with a reason — stop here.<br>
+      3. Run Event Confirmation and Fraud Detection <em>at the same time</em> (neither depends on the other).<br>
+      4. If Fraud Detection's risk score is high, route to a human investigator regardless.<br>
+      5. Otherwise, run the Assessment agent, then the Audit agent to prepare a clean summary.<br>
+      6. A human adjuster reviews the summary and authorizes payment.</p>
+    </div>
+
+    <div class="callout callout--insight" style="margin-top:20px;">
+      <span class="callout-label">&#128161; If you only remember one thing about orchestration</span>
+      <p>Complex workflows don't use one giant agent. They use an orchestration manager that coordinates multiple small, narrow specialist agents — passing clean structured data between them.</p>
+    </div>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 06 — AFTER AGENTS
+     ============================================================ -->
+<section class="section" id="after-agents">
+  <div class="wrap-wide">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-check"></use></svg> Section 06</span>
+      <h2>Meridian Mutual, after agents</h2>
+      <p class="dek">Same hurricane, same 5,000 claims — but now six specialized agents handle the structured parts, and people spend their attention on judgment calls instead of data entry.</p>
+    </div>
+
+    <div class="diagram">
+      <div class="diagram-label"><span>Fig. 4 — The multi-agent claims workflow</span><span>6 agents, orchestrated, plus one human authority layer</span></div>
+      <div class="flow">
+        <div class="flow-step gate-auto"><div class="step-icon"><svg class="icon-lg"><use href="#icon-doc"></use></svg></div><h5>Intake Agent</h5><p>Reads the form, extracts structured data.</p><span class="badge badge--auto" style="margin-top:8px;"><svg><use href="#icon-check"></use></svg>auto</span></div>
+        <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step gate-auto"><div class="step-icon"><svg class="icon-lg"><use href="#icon-gate"></use></svg></div><h5>Coverage Verification</h5><p>Confirms the policy is active and covers this event.</p><span class="badge badge--auto" style="margin-top:8px;"><svg><use href="#icon-check"></use></svg>auto</span></div>
+        <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-branch">
+          <div class="flow-step gate-review"><h5>Event Confirmation</h5><p>Checks the disaster actually occurred here.</p><span class="badge badge--review" style="margin-top:6px;"><svg><use href="#icon-flag"></use></svg>if not found, escalate</span></div>
+          <div class="flow-step gate-review"><h5>Fraud Detection</h5><p>Scores risk against history and patterns.</p><span class="badge badge--review" style="margin-top:6px;"><svg><use href="#icon-flag"></use></svg>if high risk, escalate</span></div>
+        </div>
+        <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step gate-review"><div class="step-icon"><svg class="icon-lg"><use href="#icon-stack"></use></svg></div><h5>Assessment Agent</h5><p>Estimates damage and calculates a payout figure.</p><span class="badge badge--review" style="margin-top:8px;"><svg><use href="#icon-flag"></use></svg>flag if uncertain</span></div>
+        <div class="flow-arrow"><svg class="icon-lg"><use href="#icon-arrow"></use></svg></div>
+        <div class="flow-step human"><div class="step-icon"><svg class="icon-lg"><use href="#icon-person"></use></svg></div><h5>Human Adjuster</h5><p>Reviews flagged items, exercises judgment, authorizes payment.</p><span class="badge badge--human" style="margin-top:8px;"><svg><use href="#icon-person"></use></svg>final authority</span></div>
+      </div>
+    </div>
+
+    <div class="timeline" style="margin-top:36px;">
+      <div class="timeline-row"><div class="tl-label">Backlog cleared in</div><div class="tl-track"><div class="tl-fill before" style="width:94%;">Before — 3 to 6 weeks</div></div></div>
+      <div class="timeline-row"><div class="tl-label">&nbsp;</div><div class="tl-track"><div class="tl-fill after" style="width:22%;">After — 3 to 4 days</div></div></div>
+    </div>
+    <p class="disclaimer">Illustrative figures, proportioned to match patterns reported across real insurance-industry deployments.</p>
+
+    <div class="callout callout--insight">
+      <span class="callout-label">What actually changed — and what didn't</span>
+      <p>The adjuster team didn't get smaller, and no agent gained the authority to approve a payout. What changed is where human attention gets spent: instead of people spending the same twenty minutes of data entry on each of 5,000 claims, the team spends its hours on the roughly 1,500 files that genuinely need judgment. <strong>Redistribution of human attention, not removal of it.</strong></p>
+    </div>
+
+    <div class="callout callout--insight" style="margin-top:24px;">
+      <span class="callout-label">&#128161; If you only remember one thing about authority</span>
+      <p>Agents handle repetitive data collection and initial evaluation, but financial, legal, and ethical decisions remain anchored to human authority. Automation redistributes human attention to where it matters most.</p>
+    </div>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 07 — FIVE SYSTEMS COMPARED
+     ============================================================ -->
+<section class="section section-alt" id="five-systems">
+  <div class="wrap-wide">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-stack"></use></svg> Section 07</span>
+      <h2>Five kinds of system, compared honestly</h2>
+      <p class="dek">"AI agent" is one point on a spectrum, not a replacement for everything that came before it.</p>
+    </div>
+
+    <div class="table-scroll">
+      <table class="compare">
+        <caption>Fig. 5 — Traditional software, automation, AI assistants, AI agents, and multi-agent systems</caption>
+        <thead><tr><th></th><th>Traditional Software</th><th>Simple Automation</th><th>AI Assistant</th><th>AI Agent</th><th>Multi-Agent System</th></tr></thead>
+        <tbody>
+          <tr><th>How it decides</th><td>Fixed rules a person wrote</td><td>Fixed rules, no judgment</td><td>Pattern-matching, per question</td><td>Pattern-matching, across linked steps</td><td>Several agents, coordinated</td></tr>
+          <tr><th>Takes action?</th><td class="hi">Yes (for coded paths)</td><td class="hi">Yes (for defined rules)</td><td class="lo">Not without human approval</td><td class="hi">Yes, within defined scope</td><td class="hi">Yes, across a wider scope</td></tr>
+          <tr><th>Handles novelty?</th><td class="lo">No</td><td class="lo">No</td><td class="hi">Somewhat, in conversation</td><td class="hi">Somewhat, within its tools</td><td class="hi">To a degree, but adds its own failure modes</td></tr>
+          <tr><th>Best suited for</th><td>Stable, well-understood rules</td><td>Repetitive, zero-judgment steps</td><td>One-off questions, drafting help</td><td>A structured multi-step task</td><td>A whole workflow spanning specialties</td></tr>
+          <tr><th>Where it breaks</th><td>Situations the rules didn't anticipate</td><td>Anything requiring judgment</td><td>Multi-step tasks needing action</td><td>Tasks needing several unrelated specialties</td><td>Simple problems — expensive overkill</td></tr>
+          <tr><th>Cedar &amp; Pine example</th><td>Order-confirmation email system</td><td>Address-mismatch fraud flag</td><td>Rep asks for a drafted reply, edits it, sends it</td><td>Account-access and warranty agents</td><td>Returns "agent team": triage, warranty, billing agents</td></tr>
+          <tr><th>Meridian example</th><td>Payment calculation engine</td><td>Nightly data backup</td><td>Adjuster asks for a claim summary draft</td><td>Intake, Coverage, Fraud agents</td><td>The full 6-agent pipeline from Section 06</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Read the "Where it breaks" row: <strong>every system on this list has a place it breaks down.</strong> That includes the multi-agent system — its failure mode is being used where something simpler would have worked.</p>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 08 — WHERE AGENTS FIT
+     ============================================================ -->
+<section class="section" id="where-agents-fit">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-node"></use></svg> Section 08</span>
+      <h2>Where agents excel — and where they don't</h2>
+      <p class="dek">Two questions predict almost everything: how <em>structured</em> is the decision, and how much <em>volume</em> is there?</p>
+    </div>
+
+    <div class="quadrant">
+      <div class="q-axis-y"><span>Volume &#8593;</span></div>
+      <div class="q-axis-x">Structure of the decision &#8594;</div>
+      <div class="q-cell bad"><h5>High volume &middot; Low structure</h5><p><strong>The danger zone.</strong> Frequent, but genuinely ambiguous — e.g., autonomously moderating social media posts. Pattern-matching at scale amplifies mistakes on the cases where judgment matters most.</p></div>
+      <div class="q-cell good"><h5>High volume &middot; High structure</h5><p><strong>The sweet spot.</strong> Frequent <em>and</em> well-defined — Meridian's claims pipeline, Cedar &amp; Pine's warranty lookups. Clear steps, abundant past examples. This is where agents earn their cost.</p></div>
+      <div class="q-cell mixed"><h5>Low volume &middot; Low structure</h5><p><strong>Not worth automating.</strong> Rare and ambiguous — a sensitive apology letter to a loyal customer like Okafor. An AI assistant can help draft it; a dedicated agent is wasted effort.</p></div>
+      <div class="q-cell mixed"><h5>Low volume &middot; High structure</h5><p><strong>Traditional software wins.</strong> Well-defined but rare — a report generated twice a year. A simple script does this perfectly well.</p></div>
+    </div>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 09 — WHEN AN AGENT IS THE WRONG TOOL
+     ============================================================ -->
+<section class="section section-alt" id="not-the-answer">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-flag"></use></svg> Section 09</span>
+      <p class="hero-eyebrow" style="margin-bottom:12px;">The section this guide most wants you to read</p>
+      <h2>When an agent is the wrong tool</h2>
+      <p class="dek">Most tasks, most of the time, are better served by something simpler. Here's how to tell.</p>
+    </div>
+
+    <h3>9.1 — The ticket that goes the other way</h3>
+    <p>Remember Cedar &amp; Pine? The headlamp ticket was close to the best case for an agent. Here's a different ticket from the same inbox:</p>
+
+    <div class="ticket">
+      <div class="ticket-head"><span>TICKET #52108</span><span class="ticket-status ticket-status--escalated">AUTO-RESOLVED (poorly)</span></div>
+      <div class="ticket-body">
+        <div class="subj">Automated reply, sent 40 seconds after receipt:</div>
+        <div class="meta" style="font-style:italic; line-height:1.7;">
+          "Thank you for contacting Cedar &amp; Pine. Per our returns policy (section 3.1), items must be returned within 30 days of delivery. Your order falls outside this window and is not eligible for a refund. We appreciate your business."
+        </div>
+      </div>
+    </div>
+
+    <p>T. Okafor has ordered from Cedar &amp; Pine for six years. A jacket bought 42 days ago — 12 days past the standard 30-day return window — has a zipper that's failed. Okafor's email opens by mentioning six years of loyalty and closes with "I will never order from you again."</p>
+
+    <p>Procedurally, the agent's reply is not wrong. The order genuinely is outside the window. But Okafor posts about it publicly, disputes the charge, and stops ordering. A single accurate policy citation turned a $110 jacket into a much larger loss.</p>
+
+    <div class="callout callout--warn">
+      <span class="callout-label">What actually went wrong</span>
+      <p>Not a bug. Not a hallucination. The agent did exactly what it was built to do. What it lacked was <strong>authority and judgment</strong> — the ability to recognize that a rule applied literally can still be the wrong move. A person handling this ticket would have options the agent structurally doesn't: acknowledge the frustration, note that six years of loyalty is worth more than one jacket, and offer a replacement as a goodwill exception.</p>
+    </div>
+
+    <h3 style="margin-top:36px;">9.2 — When conventional software is simply sufficient</h3>
+    <p><strong>Example: calculating sales tax.</strong> Exact arithmetic — multiply the price by a known percentage. A few lines of code will get this right <em>every single time</em>. An agent introduces a real chance of getting basic math wrong.</p>
+
+    <h3 style="margin-top:36px;">9.3 — When simple automation is preferable</h3>
+    <p><strong>Example: syncing warehouse inventory to a website every night at 2 a.m.</strong> Repetitive, scheduled, zero judgment. A scheduled script does this reliably and cheaply.</p>
+
+    <div class="callout callout--warn">
+      <span class="callout-label">Five sentences that predict a struggling agent project</span>
+    </div>
+    <ul class="redflag-list">
+      <li><span class="rf-icon"><svg class="icon-lg"><use href="#icon-flag"></use></svg></span><div><strong>"We don't have a defined process — the AI will figure it out."</strong><br><span class="note">Agents execute a process well. They don't design a good one for you.</span></div></li>
+      <li><span class="rf-icon"><svg class="icon-lg"><use href="#icon-flag"></use></svg></span><div><strong>"We have a little data — the model will pick up the rest."</strong><br><span class="note">Sparse examples produce unreliable pattern-matching, not intuition.</span></div></li>
+      <li><span class="rf-icon"><svg class="icon-lg"><use href="#icon-flag"></use></svg></span><div><strong>"This decision is subjective, but the AI seems smart enough."</strong><br><span class="note">Values-based judgment needs human authority — that's not a capability gap AI closes.</span></div></li>
+      <li><span class="rf-icon"><svg class="icon-lg"><use href="#icon-flag"></use></svg></span><div><strong>"We'll sort out oversight after we launch."</strong><br><span class="note">Escalation rules need to exist before real cases flow through, not after.</span></div></li>
+      <li><span class="rf-icon"><svg class="icon-lg"><use href="#icon-flag"></use></svg></span><div><strong>"We want full automation — humans just slow things down."</strong><br><span class="note">The goal is redistributing human attention — not removing the one thing that catches mistakes.</span></div></li>
+    </ul>
+
+    <div class="callout callout--insight">
+      <span class="callout-label">The actual opportunity, stated honestly</span>
+      <p>The realistic case for agents isn't "replace the support team." It's "remove the repetitive 60% of the queue so the humans who remain spend their time on the 40% that actually needs a human" — which, done well, is a better job, not a smaller one.</p>
+    </div>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 10 — MISCONCEPTIONS
+     ============================================================ -->
+<section class="section" id="misconceptions">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-flag"></use></svg> Section 10</span>
+      <h2>Common misconceptions</h2>
+      <p class="dek">Each persists for a real, specific reason — usually a word carrying more meaning in everyday speech than it does in an engineering diagram.</p>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-row myth"><div class="myth-stamp">Myth</div><div class="myth-body"><p>Once deployed, an AI agent operates independently — humans are optional.</p></div></div>
+      <div class="myth-row reality"><div class="myth-stamp">Reality</div><div class="myth-body"><p>Every reliable deployment keeps a person at the highest-stakes point. "Autonomous" describes a bounded zone of confident, low-risk decisions — not the removal of oversight.</p></div></div>
+      <div class="myth-why"><strong>Why this persists</strong><p>The word "autonomous" carries decades of science-fiction baggage. In engineering, it just means "doesn't need approval for this specific step."</p></div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-row myth"><div class="myth-stamp">Myth</div><div class="myth-body"><p>An AI agent understands situations the way a person does.</p></div></div>
+      <div class="myth-row reality"><div class="myth-stamp">Reality</div><div class="myth-body"><p>It's recognizing statistical patterns. Fluent, confident output is not evidence of understanding — it's evidence of a model trained to produce fluent, confident output.</p></div></div>
+      <div class="myth-why"><strong>Why this persists</strong><p>Humans are wired to read fluent language as a sign of a mind. That instinct is usually right about other humans and misleading about language models.</p></div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-row myth"><div class="myth-stamp">Myth</div><div class="myth-body"><p>Giving an agent more tools and more data makes it more capable.</p></div></div>
+      <div class="myth-row reality"><div class="myth-stamp">Reality</div><div class="myth-body"><p>Agents juggling many loosely related tools tend to perform <em>worse</em> — every additional tool is another chance to pick the wrong one. Meridian's agents each carry two or three tools, not twelve.</p></div></div>
+      <div class="myth-why"><strong>Why this persists</strong><p>"More resources should mean more capability" is true almost everywhere else. Tool selection is the specific place this intuition breaks down.</p></div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-row myth"><div class="myth-stamp">Myth</div><div class="myth-body"><p>The more claims an agent processes, the smarter it automatically gets.</p></div></div>
+      <div class="myth-row reality"><div class="myth-stamp">Reality</div><div class="myth-body"><p>Learning from experience requires a deliberately built feedback loop. Without that infrastructure, an agent's decision rules stay exactly as they were on day one.</p></div></div>
+      <div class="myth-why"><strong>Why this persists</strong><p>People naturally improve with repetition. Whether a system learns from its own outputs is a deliberate design decision — not a built-in feature.</p></div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-row myth"><div class="myth-stamp">Myth</div><div class="myth-body"><p>Because it's a computer program, an AI agent's decisions are objective and unbiased.</p></div></div>
+      <div class="myth-row reality"><div class="myth-stamp">Reality</div><div class="myth-body"><p>An agent learns whatever pattern is present in its training examples — including any historical bias baked into who got flagged, denied, or approved in the past. At scale, it can repeat bias far more consistently than any one person would.</p></div></div>
+      <div class="myth-why"><strong>Why this persists</strong><p>"Computer" and "math" both carry a cultural association with neutrality that doesn't automatically transfer to systems trained on human-generated data.</p></div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-row myth"><div class="myth-stamp">Myth</div><div class="myth-body"><p>Deploying agents means the people who did that job are no longer needed.</p></div></div>
+      <div class="myth-row reality"><div class="myth-stamp">Reality</div><div class="myth-body"><p>At Meridian, the same adjuster team remains — spending its time on the 30% of claims that genuinely need judgment. At Cedar &amp; Pine, support staff spend more time on the Okafor tickets and less on the Alvarez tickets. It's fair to say some roles do shrink, and that transition deserves real planning rather than denial.</p></div></div>
+      <div class="myth-why"><strong>Why this persists</strong><p>It's a reasonable fear grounded in real automation history — even when it's not what the data on most current deployments shows.</p></div>
+    </div>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 11 — DIAGNOSTIC
+     ============================================================ -->
+<section class="section section-alt" id="diagnostic">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-gate"></use></svg> Section 11</span>
+      <h2>Is an agent right for your problem?</h2>
+      <p class="dek">Five questions, asked in order. A "no" at any point is a genuine, useful answer — it means something simpler is the right call, not that you've failed to find the AI angle.</p>
+    </div>
+
+    <div class="tree">
+      <div class="tree-q"><span class="qnum">Question 1</span><h5>Is the task repetitive and high-volume?</h5></div>
+      <div class="tree-branch"><div class="tb stop"><strong>No &#8594;</strong> Use traditional software or do it by hand. No scale to justify an agent.</div><div class="tb go"><strong>Yes &#8594;</strong> Continue.</div></div>
+      <div class="tree-q"><span class="qnum">Question 2</span><h5>Is it highly structured — clear steps, clear decision points?</h5></div>
+      <div class="tree-branch"><div class="tb stop"><strong>No &#8594;</strong> Too open-ended for pattern-matching. This needs human judgment, possibly with an AI assistant helping draft options.</div><div class="tb go"><strong>Yes &#8594;</strong> Continue.</div></div>
+      <div class="tree-q"><span class="qnum">Question 3</span><h5>Do you have abundant, representative past examples to learn from?</h5></div>
+      <div class="tree-branch"><div class="tb stop"><strong>No &#8594;</strong> Not yet. Gather clean historical data first — an agent trained on too little data will make unreliable calls.</div><div class="tb go"><strong>Yes &#8594;</strong> Continue.</div></div>
+      <div class="tree-q"><span class="qnum">Question 4</span><h5>Can a person review the consequential decisions before they're final?</h5></div>
+      <div class="tree-branch"><div class="tb stop"><strong>No &#8594;</strong> Redesign the workflow so someone can. An agent with no human check on high-stakes outcomes is the configuration this guide has repeatedly flagged as risky.</div><div class="tb go"><strong>Yes &#8594;</strong> Continue.</div></div>
+      <div class="tree-q"><span class="qnum">Question 5</span><h5>Is success clearly measurable?</h5></div>
+      <div class="tree-branch"><div class="tb stop"><strong>No &#8594;</strong> Define your metrics first. You can't tune confidence thresholds for a goal you can't measure.</div><div class="tb go"><strong>Yes &#8594;</strong> You likely have a good candidate — the shape of Meridian's claims problem, or Cedar &amp; Pine's warranty lookups.</div></div>
+    </div>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 12 — THE ROAD AHEAD
+     ============================================================ -->
+<section class="section" id="road-ahead">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-arrow"></use></svg> Section 12</span>
+      <h2>The road ahead</h2>
+      <p class="dek">Deliberately split in two: what the data shows, and where informed judgment takes over. Mid-2026 is early enough that the honest answer to many "what happens next" questions is genuinely "we don't fully know yet."</p>
+    </div>
+
+    <h3><span class="tag-evidence">Evidence</span> What's already measurably true, as of mid-2026</h3>
+    <ul class="plain">
+      <li><strong>Agents are being embedded into existing software fast.</strong> Industry analysts project that a significant and growing share of newly shipped enterprise applications will include at least one AI agent by end of 2026 — up from less than 5% in 2025. The exact figures vary depending on how "AI agent" is defined and who is counting, but the direction is consistent across sources.</li>
+      <li><strong>Returns are genuine — and so are failures.</strong> Organizations report a median payback period around five months. At the same time, a substantial share of agent initiatives — estimates above 40% — will be scaled back or cancelled, usually over unclear goals or weak governance, not a lack of capability.</li>
+      <li><strong>Multi-agent coordination and shared connection standards are maturing.</strong> A meaningful share of production deployments now coordinate three or more agents, and MCP has moved from a new idea to widely supported in about a year.</li>
+      <li><strong>Adoption is real but uneven across industries.</strong> Insurance and banking lead; healthcare and government lag behind, consistent with the caution those sectors' stakes usually warrant.</li>
+    </ul>
+
+    <div class="callout callout--warn">
+      <span class="callout-label">A sobering counterweight</span>
+      <p>The same analysis that shows rapid adoption also shows a high failure rate for individual projects. The two facts aren't contradictory — they're the same story: a genuinely useful technology being deployed, in a meaningful fraction of cases, onto the wrong problems or without sufficient governance. The diagnostic in Section 11 exists specifically to keep a given project on the right side of that split.</p>
+    </div>
+
+    <h3 style="margin-top:40px;"><span class="tag-speculation">Speculation</span> Reasonable guesses, held loosely</h3>
+    <ul class="plain">
+      <li><strong>Standardized connections may reduce lock-in.</strong> As MCP matures, switching the underlying model or vendor inside an agent system may become easier — though how much easier, and how fast, isn't settled.</li>
+      <li><strong>Governance and disclosure norms will probably formalize further.</strong> Expect clearer expectations — and possibly regulation — around when an organization must disclose that a decision involved an AI agent.</li>
+      <li><strong>Job roles will keep shifting more than disappearing</strong> — the pattern this guide has described — but which specific roles change shape depends on choices individual organizations haven't all made yet.</li>
+    </ul>
+
+    <p style="margin-top:32px;">If you take one idea from this section: <strong>the honest current state is real adoption, real value, and a real failure rate — not a settled verdict in either direction.</strong> Treat any confident claim about where this technology will be in five years with the same healthy skepticism this guide has tried to model throughout.</p>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 13 — FAQ
+     ============================================================ -->
+<section class="section section-alt" id="faq">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-doc"></use></svg> Section 13</span>
+      <h2>Frequently asked questions</h2>
+      <p class="dek">Shorter, more direct answers to specific things people usually want to know once they've read this far.</p>
+    </div>
+
+    <details class="faq-item"><summary>Are AI agents conscious, or actually "thinking"?</summary><div class="faq-a">No. They recognize learned patterns and generate plausible next steps. There's no inner experience, no intention, and no understanding — however fluent the output sounds.</div></details>
+    <details class="faq-item"><summary>How much does something like this cost?</summary><div class="faq-a">It varies enormously. A narrow, pre-built agent for a common task can run from roughly $50 to a few hundred per month. A custom agent built around a company's own systems is a larger project — often tens of thousands in setup — but frequently paid back within months if the task it handles was previously a meaningful chunk of labor cost.</div></details>
+    <details class="faq-item"><summary>What happens when it gets something wrong?</summary><div class="faq-a">In a well-scoped system: it escalates to a person, ideally before real harm is done, using triggers like the confidence thresholds in Section 03. In a poorly-scoped one, like Okafor's refund dispute: it confidently does the wrong thing, and a person finds out after the fact. The difference is almost entirely in how carefully the boundaries were designed.</div></details>
+    <details class="faq-item"><summary>Is it safe to let an agent access company data?</summary><div class="faq-a">Scope it the way you'd scope any employee's access: least privilege first. Read-only access to lookup systems is lower-risk than write access to payment systems — exactly the read/write distinction shown in the tool access table in Section 05.</div></details>
+    <details class="faq-item"><summary>Can an agent override its own instructions?</summary><div class="faq-a">A model can produce text that conflicts with its instructions — a known risk sometimes called prompt injection. But in a well-designed system, the agent's real-world impact is bounded by which tools it can access and what the harness allows, not by trusting the model to obey every time. The practical defense is constrained permissions, harness rules, and human governance — not hoping the model always follows directions.</div></details>
+    <details class="faq-item"><summary>How long does deployment take?</summary><div class="faq-a">Longer than most vendor pitches suggest. The real timeline is dominated by process redesign, safe integration, and governance rules — not the AI component. Months, not days, is realistic for a genuine first deployment.</div></details>
+    <details class="faq-item"><summary>Do I need to tell customers they're dealing with an agent?</summary><div class="faq-a">Practices are actively evolving. As a general posture: disclosing plainly tends to build trust, and increasingly it's becoming an expectation rather than a courtesy.</div></details>
+    <details class="faq-item"><summary>How do I know if a task I have in mind is actually a good fit?</summary><div class="faq-a">Run it against the five-question diagnostic in Section 11. If it scores well on most of those questions, it's worth investigating. If it scores poorly — especially on "well-defined" or "data-driven" — a person, or simple automation, is probably the better tool.</div></details>
+    <details class="faq-item"><summary>If the agent made a mistake, is it broken?</summary><div class="faq-a">A 95%-accurate agent handling a task humans get right 85% of the time is a genuine improvement, mistakes included. The right question isn't "did it ever fail" — it's "how does it fail, and how expensive is that failure?"</div></details>
+    <div style="text-align:right; margin-top:24px;"><a class="back-to-top" href="#top">&#8593; Back to top</a></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 14 — GLOSSARY
+     ============================================================ -->
+<section class="section" id="glossary">
+  <div class="wrap">
+    <div class="folder-header">
+      <span class="folder-tab"><svg class="icon tab-icon"><use href="#icon-stack"></use></svg> Appendix &middot; Section 14</span>
+      <h2>Glossary &amp; Reference Appendix</h2>
+      <p class="dek">Every term used in this guide, in one quick-reference alphabetical index.</p>
+    </div>
+
+    <div class="badge-key" style="justify-content:center; gap:8px 14px; margin-bottom:24px;">
+      <strong>Quick Jump:</strong>
+      <a href="#gloss-letter-A" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ A ]</a>
+      <a href="#gloss-letter-C" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ C ]</a>
+      <a href="#gloss-letter-E" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ E ]</a>
+      <a href="#gloss-letter-H" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ H ]</a>
+      <a href="#gloss-letter-L" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ L ]</a>
+      <a href="#gloss-letter-M" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ M ]</a>
+      <a href="#gloss-letter-O" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ O ]</a>
+      <a href="#gloss-letter-P" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ P ]</a>
+      <a href="#gloss-letter-R" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ R ]</a>
+      <a href="#gloss-letter-S" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ S ]</a>
+      <a href="#gloss-letter-T" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ T ]</a>
+      <a href="#gloss-letter-W" style="font-family:var(--font-mono);font-size:12px;font-weight:600;">[ W ]</a>
+    </div>
+
+    <div class="glossary-letter" id="gloss-letter-A">A</div>
+    <dl class="glossary">
+      <dt id="gloss-agent">AI Agent</dt><dd>A system combining a language model with tools, allowed to take multiple steps toward a goal within boundaries set by its designers. Acts, rather than only answering.</dd>
+      <dt id="gloss-ai">Artificial Intelligence (AI)</dt><dd>Software trained on examples to recognize patterns, rather than following explicit rules.</dd>
+      <dt id="gloss-api">API</dt><dd>Application Programming Interface — a defined way for one piece of software to request something from another.</dd>
+      <dt id="gloss-automation">Automation</dt><dd>Software built to carry out a fixed, rule-based task without human involvement at each step. Does not make judgment calls.</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-C">C</div>
+    <dl class="glossary">
+      <dt id="gloss-chatbot">Chatbot</dt><dd>Software that holds a conversation, typically answering from a script or knowledge base. Can talk; cannot, on its own, take action in other systems.</dd>
+      <dt id="gloss-confidence">Confidence Threshold</dt><dd>The certainty level above which a system acts on its own, versus flags for human review.</dd>
+      <dt id="gloss-context">Context Window</dt><dd>The maximum text (measured in tokens) a language model can consider at one time.</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-E">E</div>
+    <dl class="glossary">
+      <dt id="gloss-escalation">Escalation</dt><dd>An agent recognizing a task is beyond its confidence, authority, or scope, and routing it to a person — ideally with full context.</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-H">H</div>
+    <dl class="glossary">
+      <dt id="gloss-hallucination">Hallucination</dt><dd>When a language model produces a fluent, confident, and factually wrong answer — a natural side effect of predicting plausible text rather than consulting verified facts.</dd>
+      <dt id="gloss-harness">Harness</dt><dd>The code surrounding an agent's loop that manages retries, timeouts, logging, and escalation rules. The "vehicle" around the LLM "engine."</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-L">L</div>
+    <dl class="glossary">
+      <dt id="gloss-llm">Large Language Model (LLM)</dt><dd>An AI system trained on text to predict what comes next — often the reasoning component inside an agent.</dd>
+      <dt id="gloss-loop">Loop</dt><dd>The repeating think, act, observe, decide cycle an agent runs through while working a task.</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-M">M</div>
+    <dl class="glossary">
+      <dt id="gloss-mcp">MCP (Model Context Protocol)</dt><dd>An open standard, introduced in late 2024, for connecting AI systems to tools in one consistent way, avoiding custom wiring for each connection.</dd>
+      <dt id="gloss-memory">Memory</dt><dd>Information an agent can refer to — either within one task (short-term) or retrieved from storage (longer-term). Distinct from a model "learning" permanently.</dd>
+      <dt id="gloss-multi-agent">Multi-Agent System</dt><dd>Several specialized agents coordinated by an orchestration layer to complete a workflow no single agent handles alone.</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-O">O</div>
+    <dl class="glossary">
+      <dt id="gloss-orchestration">Orchestration</dt><dd>The logic deciding which agent runs when across a workflow, including handoffs to people.</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-P">P</div>
+    <dl class="glossary">
+      <dt id="gloss-prompt">Prompt</dt><dd>The text given to a language model describing what's wanted. The entire channel through which intent reaches the model.</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-R">R</div>
+    <dl class="glossary">
+      <dt id="gloss-retrieval">Retrieval</dt><dd>Fetching a fact from a real, current source and placing it in the context window, rather than relying on trained-in patterns. The primary defense against hallucination.</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-S">S</div>
+    <dl class="glossary">
+      <dt id="gloss-software">Software</dt><dd>Any set of instructions a computer follows. The baseline everything else in this guide is a variation of.</dd>
+      <dt id="gloss-structured">Structured Output</dt><dd>A model's answer in a fixed, predictable format — named fields rather than free prose — so other software can act on it directly.</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-T">T</div>
+    <dl class="glossary">
+      <dt id="gloss-token">Token</dt><dd>A small chunk of text, often a word fragment, that a language model reads and writes. What usage and limits are measured in.</dd>
+      <dt id="gloss-tool">Tool</dt><dd>A specific capability made available to an agent through an API — the mechanism by which an agent reaches outside itself to check data or take action.</dd>
+    </dl>
+    <div class="glossary-letter" id="gloss-letter-W">W</div>
+    <dl class="glossary">
+      <dt id="gloss-workflow">Workflow</dt><dd>A sequence of steps that turns a starting situation into a finished outcome. What automation, assistants, agents, and people are all, ultimately, different ways of running.</dd>
+    </dl>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap center">
+    <div class="divider-mini" style="margin-left:auto;margin-right:auto;"></div>
+    <p>This guide is an educational reference, not a product pitch. Cedar &amp; Pine Outfitters and Meridian Mutual Insurance are composite, illustrative examples, not real companies. Figures throughout are proportioned to reflect patterns reported across real deployments, not audited results from any single organization. Where this guide discusses contested questions — particularly around jobs — it aims to represent more than one reasonable view rather than argue for one.</p>
+    <a class="back-to-top" href="#top">&#8593; Back to top</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var toggleBtn = document.getElementById('tocToggle');
+  var drawer = document.getElementById('tocDrawer');
+  var closeBtn = document.getElementById('tocClose');
+  function openDrawer(){ drawer.classList.add('open'); if(closeBtn){ closeBtn.focus(); } }
+  function shutDrawer(){ drawer.classList.remove('open'); if(toggleBtn){ toggleBtn.focus(); } }
+  if(toggleBtn){ toggleBtn.addEventListener('click', openDrawer); }
+  if(closeBtn){ closeBtn.addEventListener('click', shutDrawer); }
+  if(drawer){ drawer.addEventListener('click', function(e){ if(e.target === drawer){ shutDrawer(); } }); }
+  document.querySelectorAll('.toc-list a').forEach(function(a){ a.addEventListener('click', shutDrawer); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ shutDrawer(); } });
+  var rail = document.getElementById('progressRail');
+  function updateProgress(){
+    var el = document.documentElement;
+    var scrollTop = el.scrollTop || document.body.scrollTop;
+    var scrollHeight = (el.scrollHeight || document.body.scrollHeight) - el.clientHeight;
+    var pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    if(rail){ rail.style.width = pct + '%'; }
+  }
+  window.addEventListener('scroll', updateProgress, {passive:true});
+  updateProgress();
+})();
+</script>
+
+</body>
+</html>

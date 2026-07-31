@@ -36,6 +36,7 @@ export const NAV_ENTRIES: NavEntry[] = [
     href: '/research',
     children: [
       { label: 'Research', href: '/research', description: 'Governance frameworks and structural analysis' },
+      { label: 'Agentic AI Guide', href: '/understanding-ai-agents', description: 'How agents actually work, in plain English' },
       { label: 'Field Notes', href: '/digest', description: 'Observations from active research' },
       { label: 'Clauses', href: '/clauses', description: 'Governance principles and constitutional fragments' },
     ],
@@ -70,6 +71,7 @@ export const NAV_ENTRIES: NavEntry[] = [
 export const FOOTER_LINKS = {
   research: [
     { label: 'Research', href: '/research' },
+    { label: 'Agentic AI Guide', href: '/understanding-ai-agents' },
     { label: 'Field Notes', href: '/digest' },
     { label: 'Clauses', href: '/clauses' },
   ],
